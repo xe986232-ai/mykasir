@@ -97,6 +97,116 @@ export function CarrotIcon() {
   );
 }
 
+export function PomegranateIcon() {
+  return (
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M52 20l4 8 4-8 4 6-3 8h-10l-3-8 4-6z" fill="#4C8B3B" />
+      <path
+        d="M60 34c18 0 32 14 32 34s-14 34-32 34-32-14-32-34 14-34 32-34z"
+        fill="url(#pomShade)"
+      />
+      <path d="M50 24l3 8-6 2-2-8 5-2z" fill="#B9282F" />
+      <path d="M70 24l-3 8 6 2 2-8-5-2z" fill="#B9282F" />
+      <g fill="#7A0F1A" opacity="0.35">
+        <circle cx="48" cy="60" r="7" />
+        <circle cx="70" cy="58" r="6" />
+        <circle cx="60" cy="76" r="7" />
+        <circle cx="45" cy="78" r="5" />
+        <circle cx="75" cy="76" r="5" />
+      </g>
+      <defs>
+        <linearGradient id="pomShade" x1="28" y1="34" x2="92" y2="102" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#E23A3A" />
+          <stop offset="1" stopColor="#A5171F" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+export function OnionIcon() {
+  return (
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M58 20c1 8-3 12-3 18h10c0-6-4-10-3-18h-4z" fill="#8A6A45" />
+      <path
+        d="M60 36c17 0 28 15 28 32 0 19-13 34-28 34s-28-15-28-34c0-17 11-32 28-32z"
+        fill="url(#onionShade)"
+      />
+      <path
+        d="M60 36c9 0 16 8 18 20-6-4-12-6-18-6s-12 2-18 6c2-12 9-20 18-20z"
+        fill="#B94A6E"
+        opacity="0.55"
+      />
+      <path d="M40 62c8-5 15-6 20-6" stroke="#7A2545" strokeWidth="2" opacity="0.4" strokeLinecap="round" />
+      <path d="M80 62c-8-5-15-6-20-6" stroke="#7A2545" strokeWidth="2" opacity="0.4" strokeLinecap="round" />
+      <defs>
+        <linearGradient id="onionShade" x1="32" y1="36" x2="88" y2="102" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F3D9E4" />
+          <stop offset="1" stopColor="#D9A9C0" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+export function RaspberryIcon() {
+  return (
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M58 30c-4-6-4-6 0-12 4 6 4 6 0 12z" fill="#4C8B3B" />
+      <path d="M50 32c-6-4-13-3-17 2 3 4 9 5 13 3" fill="#5C9F45" />
+      <path d="M70 32c6-4 13-3 17 2-3 4-9 5-13 3" fill="#5C9F45" />
+      <g fill="url(#raspShade)">
+        <circle cx="48" cy="46" r="9" />
+        <circle cx="60" cy="42" r="9" />
+        <circle cx="72" cy="46" r="9" />
+        <circle cx="42" cy="60" r="9" />
+        <circle cx="54" cy="58" r="9" />
+        <circle cx="66" cy="58" r="9" />
+        <circle cx="78" cy="60" r="9" />
+        <circle cx="48" cy="74" r="9" />
+        <circle cx="60" cy="76" r="9" />
+        <circle cx="72" cy="74" r="9" />
+        <circle cx="54" cy="88" r="8" />
+        <circle cx="66" cy="88" r="8" />
+      </g>
+      <defs>
+        <linearGradient id="raspShade" x1="35" y1="40" x2="85" y2="96" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#D93A5C" />
+          <stop offset="1" stopColor="#9E1B36" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+export function BroccoliIcon() {
+  return (
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M56 70h8l4 26h-16l4-26z" fill="#C7D24A" />
+      <g fill="url(#broccShade)">
+        <circle cx="45" cy="48" r="15" />
+        <circle cx="60" cy="38" r="17" />
+        <circle cx="76" cy="48" r="15" />
+        <circle cx="52" cy="62" r="14" />
+        <circle cx="68" cy="62" r="14" />
+      </g>
+      <g fill="#3E6E2E" opacity="0.4">
+        <circle cx="45" cy="48" r="3" />
+        <circle cx="60" cy="38" r="3" />
+        <circle cx="76" cy="48" r="3" />
+        <circle cx="52" cy="62" r="2.5" />
+        <circle cx="68" cy="62" r="2.5" />
+      </g>
+      <defs>
+        <linearGradient id="broccShade" x1="30" y1="24" x2="90" y2="76" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#7DB84B" />
+          <stop offset="1" stopColor="#4C8B3B" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
 export function TomatoIcon() {
   return (
     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
