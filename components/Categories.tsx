@@ -4,7 +4,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { LayoutGrid } from "lucide-react";
 import {
-  DealsIcon,
   FruitsIcon,
   VegetableIcon,
   DrinksIcon,
@@ -19,7 +18,7 @@ type IconCategory = {
 
 const categories: (ImageCategory | IconCategory)[] = [
   { label: "Kunci Mas", image: "/categories/kunci-mas.png" },
-  { label: "Best Deals", bg: "#F0562E", Icon: DealsIcon },
+  { label: "Mi Instan", image: "/categories/mie-instan.png" },
   { label: "Fruits", bg: "#2FB350", Icon: FruitsIcon },
   { label: "Vegetable", bg: "#EF9526", Icon: VegetableIcon },
   { label: "Drinks", bg: "#8B5CF6", Icon: DrinksIcon },
