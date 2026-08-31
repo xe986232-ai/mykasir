@@ -31,7 +31,7 @@ export default function FilterChips() {
         aria-label="Filters"
         className="ml-5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
       >
-        <SlidersHorizontal size={15} className="text-[--color-ink]" />
+        <SlidersHorizontal size={15} className="text-ink" />
       </button>
 
       <div className="flex gap-2 overflow-x-auto pr-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -43,8 +43,8 @@ export default function FilterChips() {
               onClick={() => toggle(id)}
               className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-semibold transition-colors ${
                 isActive
-                  ? "bg-[--color-primary] text-white"
-                  : "bg-white text-[--color-ink] shadow-[0_2px_10px_rgba(20,24,20,0.06)]"
+                  ? "bg-primary text-white"
+                  : "bg-white text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)]"
               }`}
             >
               {Icon && <Icon size={13} strokeWidth={2.4} />}

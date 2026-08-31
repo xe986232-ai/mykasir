@@ -63,17 +63,17 @@ export default function PromoBanner() {
           >
             <div className="z-10 flex h-full flex-col justify-between py-1">
               <div>
-                <p className="text-[13px] font-semibold text-[--color-ink]">
+                <p className="text-[13px] font-semibold text-ink">
                   {slide.title}
                 </p>
-                <p className="mt-1 text-[26px] font-extrabold leading-none text-[--color-primary-dark]">
+                <p className="mt-1 text-[26px] font-extrabold leading-none text-primary-dark">
                   {slide.discount}
                 </p>
-                <p className="mt-1.5 text-[11px] text-[--color-gray]">
+                <p className="mt-1.5 text-[11px] text-gray">
                   {slide.date}
                 </p>
               </div>
-              <button className="w-fit rounded-full bg-[--color-primary] px-5 py-2 text-[12px] font-bold text-white shadow-[0_6px_14px_rgba(47,179,80,0.35)] active:scale-95 transition-transform">
+              <button className="w-fit rounded-full bg-primary px-5 py-2 text-[12px] font-bold text-white shadow-[0_6px_14px_rgba(47,179,80,0.35)] active:scale-95 transition-transform">
                 {slide.cta}
               </button>
             </div>

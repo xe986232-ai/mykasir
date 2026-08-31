@@ -25,7 +25,7 @@ export default function ProductCard({
   return (
     <div className="relative overflow-hidden rounded-2xl bg-white p-3 shadow-[0_2px_10px_rgba(20,24,20,0.06)]">
       {delivery && (
-        <span className="absolute left-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-[--color-delivery] px-2 py-1 text-[9px] font-bold text-white">
+        <span className="absolute left-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-delivery px-2 py-1 text-[9px] font-bold text-white">
           <Truck size={10} strokeWidth={2.5} />
           Free Delivery
         </span>
@@ -37,15 +37,15 @@ export default function ProductCard({
         </div>
       </div>
 
-      <p className="mt-1 text-[13.5px] font-extrabold text-[--color-ink]">
+      <p className="mt-1 text-[13.5px] font-extrabold text-ink">
         {price}
       </p>
       <div className="mt-1 flex items-end justify-between gap-1">
         <div className="min-w-0">
-          <p className="truncate text-[12px] font-medium text-[--color-ink]">
+          <p className="truncate text-[12px] font-medium text-ink">
             {name}
           </p>
-          <p className="text-[10.5px] text-[--color-gray]">{unit}</p>
+          <p className="text-[10.5px] text-gray">{unit}</p>
         </div>
 
         <motion.button

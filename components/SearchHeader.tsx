@@ -17,15 +17,15 @@ export default function SearchHeader() {
         aria-label="Back"
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
       >
-        <ArrowLeft size={18} className="text-[--color-ink]" />
+        <ArrowLeft size={18} className="text-ink" />
       </Link>
 
       <div className="flex flex-1 items-center gap-2.5 rounded-2xl bg-white px-4 py-3 shadow-[0_2px_10px_rgba(20,24,20,0.06)]">
-        <Search size={18} className="text-[--color-gray]" />
+        <Search size={18} className="text-gray" />
         <input
           type="text"
           placeholder="Would you like to eat somethings?"
-          className="w-full bg-transparent text-[13.5px] text-[--color-ink] placeholder:text-[--color-gray] outline-none"
+          className="w-full bg-transparent text-[13.5px] text-ink placeholder:text-gray outline-none"
         />
       </div>
     </motion.div>

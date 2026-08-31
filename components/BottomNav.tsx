@@ -16,7 +16,7 @@ export default function BottomNav() {
   const [active, setActive] = useState(0);
 
   return (
-    <div className="sticky bottom-0 mt-auto border-t border-[--color-gray-light] bg-white/95 backdrop-blur px-2 pb-[max(10px,env(safe-area-inset-bottom))] pt-2">
+    <div className="sticky bottom-0 mt-auto border-t border-gray-light bg-white/95 backdrop-blur px-2 pb-[max(10px,env(safe-area-inset-bottom))] pt-2">
       <div className="flex items-center justify-between">
         {items.map(({ label, Icon }, i) => {
           const isActive = active === i;
@@ -30,14 +30,14 @@ export default function BottomNav() {
                 <Icon
                   size={20}
                   strokeWidth={isActive ? 2.4 : 1.8}
-                  className={isActive ? "text-[--color-primary]" : "text-[--color-gray]"}
+                  className={isActive ? "text-primary" : "text-gray"}
                 />
               </div>
               <span
                 className={`text-[10px] ${
                   isActive
-                    ? "font-bold text-[--color-primary]"
-                    : "font-medium text-[--color-gray]"
+                    ? "font-bold text-primary"
+                    : "font-medium text-gray"
                 }`}
               >
                 {label}
@@ -45,7 +45,7 @@ export default function BottomNav() {
               {isActive && (
                 <motion.span
                   layoutId="nav-dot"
-                  className="absolute -bottom-0 h-1 w-1 rounded-full bg-[--color-primary]"
+                  className="absolute -bottom-0 h-1 w-1 rounded-full bg-primary"
                   transition={{ duration: 0.25 }}
                 />
               )}

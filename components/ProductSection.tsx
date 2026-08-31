@@ -21,8 +21,8 @@ export default function ProductSection() {
       className="mt-6 px-5 pb-6"
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-[15px] font-bold text-[--color-ink]">Top Fruits 2025</h2>
-        <Link href="/produk" className="text-[12px] font-semibold text-[--color-primary]">
+        <h2 className="text-[15px] font-bold text-ink">Top Fruits 2025</h2>
+        <Link href="/produk" className="text-[12px] font-semibold text-primary">
           View all
         </Link>
       </div>

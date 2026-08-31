@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const stores = [
   { name: "GreenMart", initial: "G", bg: "#2FB350" },
@@ -9,9 +10,16 @@ const stores = [
   { name: "Nesto", initial: "N", bg: "#F5B301" },
   { name: "VivaSup...", initial: "V", bg: "#8B5CF6" },
   { name: "AlMaya", initial: "A", bg: "#0EA5A5" },
+  { name: "Carrefour", initial: "C", bg: "#0B63CE" },
+  { name: "Spinneys", initial: "S", bg: "#16A34A" },
+  { name: "Choithrams", initial: "C", bg: "#DB2777" },
+  { name: "Union Coop", initial: "U", bg: "#EA580C" },
 ];
 
 export default function StoreRow() {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? stores : stores.slice(0, 6);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -20,32 +28,68 @@ export default function StoreRow() {
       className="mt-6 px-5"
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-[15px] font-bold text-[--color-ink]">
-          Top Grocery Stores
-        </h2>
-        <button className="text-[12px] font-semibold text-[--color-primary]">
-          View all
+        <h2 className="text-[15px] font-bold text-ink">Top Grocery Stores</h2>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="text-[12px] font-semibold text-primary active:opacity-60"
+        >
+          {expanded ? "Show less" : "View all"}
         </button>
       </div>
 
-      <div className="mt-3 flex gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {stores.map((s) => (
-          <button
-            key={s.name}
-            className="flex w-[58px] shrink-0 flex-col items-center gap-1.5 active:scale-95 transition-transform"
+      <AnimatePresence mode="wait" initial={false}>
+        {expanded ? (
+          <motion.div
+            key="grid"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="mt-3 grid grid-cols-4 gap-x-2 gap-y-4"
           >
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-2xl text-[15px] font-extrabold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)]"
-              style={{ backgroundColor: s.bg }}
-            >
-              {s.initial}
-            </div>
-            <span className="truncate text-[10px] text-[--color-gray]">
-              {s.name}
-            </span>
-          </button>
-        ))}
-      </div>
+            {visible.map((s) => (
+              <StoreBadge key={s.name} {...s} />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="row"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="mt-3 flex gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {visible.map((s) => (
+              <div key={s.name} className="shrink-0">
+                <StoreBadge {...s} />
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
+  );
+}
+
+function StoreBadge({
+  name,
+  initial,
+  bg,
+}: {
+  name: string;
+  initial: string;
+  bg: string;
+}) {
+  return (
+    <button className="flex w-[58px] flex-col items-center gap-1.5 active:scale-95 transition-transform">
+      <div
+        className="flex h-12 w-12 items-center justify-center rounded-2xl text-[15px] font-extrabold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)]"
+        style={{ backgroundColor: bg }}
+      >
+        {initial}
+      </div>
+      <span className="truncate text-[10px] text-gray">{name}</span>
+    </button>
   );
 }

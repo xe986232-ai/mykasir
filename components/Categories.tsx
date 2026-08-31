@@ -38,15 +38,15 @@ export default function Categories() {
             >
               <Icon />
             </div>
-            <span className="text-center text-[11px] font-medium leading-tight text-[--color-ink]">
+            <span className="text-center text-[11px] font-medium leading-tight text-ink">
               {label}
             </span>
           </button>
         ))}
       </div>
 
-      <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-[13px] font-semibold text-[--color-ink] shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform">
-        <LayoutGrid size={16} className="text-[--color-primary]" />
+      <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-[13px] font-semibold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform">
+        <LayoutGrid size={16} className="text-primary" />
         View More Categories
       </button>
     </motion.div>

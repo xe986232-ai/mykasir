@@ -20,7 +20,7 @@ export default function Header() {
         </div>
         <div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[15px] font-bold text-[--color-ink] leading-none">
+            <span className="text-[15px] font-bold text-ink leading-none">
               Muhammad Farhan
             </span>
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
@@ -31,7 +31,7 @@ export default function Header() {
               <path d="M6.3 10.2l2.4 2.4 5-5.6" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
             </svg>
           </div>
-          <button className="mt-0.5 flex items-center gap-0.5 text-[12px] text-[--color-gray]">
+          <button className="mt-0.5 flex items-center gap-0.5 text-[12px] text-gray">
             Dubai, United Arab Emirate
             <ChevronDown size={12} strokeWidth={2.5} />
           </button>
@@ -43,14 +43,14 @@ export default function Header() {
           aria-label="Cart"
           className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
         >
-          <ShoppingBag size={18} strokeWidth={2} className="text-[--color-ink]" />
+          <ShoppingBag size={18} strokeWidth={2} className="text-ink" />
         </button>
         <button
           aria-label="Notifications"
           className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
         >
-          <Bell size={18} strokeWidth={2} className="text-[--color-ink]" />
-          <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[--color-badge] px-1 text-[9px] font-bold text-white ring-2 ring-[#EFF1F0]">
+          <Bell size={18} strokeWidth={2} className="text-ink" />
+          <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-badge px-1 text-[9px] font-bold text-white ring-2 ring-[#EFF1F0]">
             12
           </span>
         </button>
