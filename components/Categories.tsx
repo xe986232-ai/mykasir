@@ -1,17 +1,24 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { LayoutGrid } from "lucide-react";
 import {
-  HalalIcon,
   DealsIcon,
   FruitsIcon,
   VegetableIcon,
   DrinksIcon,
 } from "./icons/Categories";
 
-const categories = [
-  { label: "Halal Shop", bg: "#F5B301", Icon: HalalIcon },
+type ImageCategory = { label: string; image: string };
+type IconCategory = {
+  label: string;
+  bg: string;
+  Icon: () => React.ReactElement;
+};
+
+const categories: (ImageCategory | IconCategory)[] = [
+  { label: "Kunci Mas", image: "/categories/kunci-mas.png" },
   { label: "Best Deals", bg: "#F0562E", Icon: DealsIcon },
   { label: "Fruits", bg: "#2FB350", Icon: FruitsIcon },
   { label: "Vegetable", bg: "#EF9526", Icon: VegetableIcon },
@@ -27,19 +34,31 @@ export default function Categories() {
       className="mt-6 px-5"
     >
       <div className="flex items-start justify-between">
-        {categories.map(({ label, bg, Icon }) => (
+        {categories.map((cat) => (
           <button
-            key={label}
+            key={cat.label}
             className="flex w-[58px] flex-col items-center gap-2 active:scale-95 transition-transform"
           >
-            <div
-              className="flex h-14 w-14 items-center justify-center rounded-2xl shadow-[0_6px_14px_rgba(20,24,20,0.1)]"
-              style={{ backgroundColor: bg }}
-            >
-              <Icon />
-            </div>
+            {"image" in cat ? (
+              <div className="flex h-14 w-14 items-center justify-center">
+                <Image
+                  src={cat.image}
+                  alt={cat.label}
+                  width={56}
+                  height={56}
+                  className="h-14 w-14 object-contain"
+                />
+              </div>
+            ) : (
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-2xl shadow-[0_6px_14px_rgba(20,24,20,0.1)]"
+                style={{ backgroundColor: cat.bg }}
+              >
+                <cat.Icon />
+              </div>
+            )}
             <span className="text-center text-[11px] font-medium leading-tight text-ink">
-              {label}
+              {cat.label}
             </span>
           </button>
         ))}
