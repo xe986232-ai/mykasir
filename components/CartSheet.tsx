@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Banknote, CheckCircle2, ChevronLeft, Minus, Plus, QrCode, Trash2, Wallet, X } from "lucide-react";
 import { useCart } from "./CartContext";
+import AnimatedNumber from "./AnimatedNumber";
 
 type Step = "cart" | "payment" | "success";
 type PaymentMethod = "cash" | "qris" | "card";
@@ -129,7 +130,9 @@ export default function CartSheet({
                               {item.name}
                             </p>
                             <p className="text-[11.5px] font-bold text-primary">
-                              {formatMoney(item.priceValue * item.qty, item.currency)}
+                              <AnimatedNumber
+                                value={formatMoney(item.priceValue * item.qty, item.currency)}
+                              />
                             </p>
                           </div>
 
@@ -148,7 +151,7 @@ export default function CartSheet({
                               )}
                             </button>
                             <span className="w-4 text-center text-[12.5px] font-bold text-ink">
-                              {item.qty}
+                              <AnimatedNumber value={item.qty} />
                             </span>
                             <button
                               onClick={() => increment(item.id)}
@@ -169,7 +172,7 @@ export default function CartSheet({
                     <div className="flex items-center justify-between">
                       <span className="text-[12.5px] text-gray">Subtotal</span>
                       <span className="text-[15px] font-extrabold text-ink">
-                        {formatMoney(subtotal, currency)}
+                        <AnimatedNumber value={formatMoney(subtotal, currency)} />
                       </span>
                     </div>
                     <button
@@ -225,7 +228,7 @@ export default function CartSheet({
                   <div className="flex items-center justify-between">
                     <span className="text-[12.5px] text-gray">Total Tagihan</span>
                     <span className="text-[13.5px] font-bold text-ink">
-                      {formatMoney(subtotal, currency)}
+                      <AnimatedNumber value={formatMoney(subtotal, currency)} />
                     </span>
                   </div>
                   {method === "cash" && (
@@ -236,7 +239,7 @@ export default function CartSheet({
                           change < 0 ? "text-badge" : "text-primary"
                         }`}
                       >
-                        {formatMoney(Math.max(change, 0), currency)}
+                        <AnimatedNumber value={formatMoney(Math.max(change, 0), currency)} />
                       </span>
                     </div>
                   )}

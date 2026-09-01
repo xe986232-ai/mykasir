@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Minus, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { useCart } from "./CartContext";
 
 export default function KasirProductCard(product: Omit<Product, "category">) {
   const { name, unit, price, Icon, image } = product;
-  const { items, addItem, increment, decrement } = useCart();
+  const { items, addItem } = useCart();
 
   const cartItem = items.find((it) => it.id === product.id);
   const qty = cartItem?.qty ?? 0;
@@ -48,39 +48,27 @@ export default function KasirProductCard(product: Omit<Product, "category">) {
           <p className="text-[10.5px] text-gray">{unit}</p>
         </div>
 
-        {qty === 0 ? (
-          <button
-            onClick={() => addItem(product)}
-            aria-label={`Tambah ${name} ke keranjang`}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-white active:scale-90 transition-transform"
-          >
-            <Plus size={14} strokeWidth={2.8} />
-          </button>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex shrink-0 items-center gap-1 rounded-full bg-primary-light px-1 py-1"
-          >
-            <button
-              onClick={() => decrement(product.id)}
-              aria-label={`Kurangi ${name}`}
-              className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-primary shadow-sm active:scale-90 transition-transform"
+        {/* Sengaja cuma tombol tambah polos — atur/kurangi jumlah dilakukan
+            di overlay checkout (CartSheet), bukan di card ini. Badge kecil
+            di pojok cuma indikator jumlah yang udah masuk keranjang. */}
+        <button
+          onClick={() => addItem(product)}
+          aria-label={`Tambah ${name} ke keranjang`}
+          className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-white active:scale-90 transition-transform"
+        >
+          <Plus size={14} strokeWidth={2.8} />
+          {qty > 0 && (
+            <motion.span
+              key={qty}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 500, damping: 22 }}
+              className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-badge px-1 text-[9px] font-bold text-white"
             >
-              <Minus size={12} strokeWidth={2.8} />
-            </button>
-            <span className="w-4 text-center text-[12px] font-bold text-primary-dark">
               {qty}
-            </span>
-            <button
-              onClick={() => increment(product.id)}
-              aria-label={`Tambah ${name}`}
-              className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white shadow-sm active:scale-90 transition-transform"
-            >
-              <Plus size={12} strokeWidth={2.8} />
-            </button>
-          </motion.div>
-        )}
+            </motion.span>
+          )}
+        </button>
       </div>
     </div>
   );

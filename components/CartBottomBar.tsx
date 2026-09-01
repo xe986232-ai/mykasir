@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "./CartContext";
+import AnimatedNumber from "./AnimatedNumber";
 
 export default function CartBottomBar() {
   const { itemCount, subtotal, currency, openSheet } = useCart();
@@ -22,16 +23,17 @@ export default function CartBottomBar() {
             <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
               <ShoppingBag size={15} className="text-white" />
               <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-badge px-1 text-[9px] font-bold text-white">
-                {itemCount}
+                <AnimatedNumber value={itemCount} />
               </span>
             </div>
             <span className="text-[12.5px] font-semibold text-white/90">
-              {itemCount} item
+              <AnimatedNumber value={itemCount} /> item
             </span>
           </div>
-          <span className="text-[13.5px] font-extrabold text-white">
-            {currency} {Math.round(subtotal).toLocaleString("id-ID")}
-          </span>
+          <AnimatedNumber
+            value={`${currency} ${Math.round(subtotal).toLocaleString("id-ID")}`}
+            className="text-[13.5px] font-extrabold text-white"
+          />
         </motion.button>
       )}
     </AnimatePresence>
