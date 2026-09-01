@@ -2,8 +2,39 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, ShoppingCart, Package, Tag, FileText } from "lucide-react";
+import { ShoppingCart, Package, Tag, FileText } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
+
+// Icon dashboard di kode HTML aslinya pakai 4 lingkaran (bukan 4 kotak
+// kayak lucide LayoutGrid), jadi di-custom biar sama persis.
+function DashboardIcon({
+  size = 18,
+  strokeWidth = 1.8,
+  className,
+}: {
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="6.4" cy="6.4" r="5" />
+      <circle cx="17.6" cy="6.4" r="5" />
+      <circle cx="6.4" cy="17.6" r="5" />
+      <circle cx="17.6" cy="17.6" r="5" />
+    </svg>
+  );
+}
 
 // Sama seperti --sidebar-w & gap di kode HTML aslinya, cuma diskalakan
 // biar pas dengan frame kartu mobile (max-w-430) di app ini.
@@ -19,7 +50,7 @@ const navSections = [
   {
     label: "Menu",
     items: [
-      { label: "Dashboard", href: "/", Icon: LayoutGrid },
+      { label: "Dashboard", href: "/", Icon: DashboardIcon },
       { label: "Kasir", href: "#", Icon: ShoppingCart },
     ],
   },
