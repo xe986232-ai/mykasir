@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShoppingBag, Bell, ChevronDown } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
@@ -21,12 +22,15 @@ export default function Header() {
           onClick={toggle}
           aria-label="Buka menu navigasi"
           aria-expanded={isOpen}
-          className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-[#2FB350] to-[#1F7A32] ring-2 ring-white transition-transform active:scale-95"
+          className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full ring-2 ring-white transition-transform active:scale-95"
         >
-          <svg viewBox="0 0 44 44" className="h-full w-full">
-            <circle cx="22" cy="17" r="7" fill="#FFE0C2" />
-            <path d="M8 40c1-9 7-14 14-14s13 5 14 14" fill="#3B4149" />
-          </svg>
+          <Image
+            src="/avatar/user-avatar.jpg"
+            alt="Foto profil"
+            fill
+            sizes="44px"
+            className="object-cover"
+          />
         </button>
         <div>
           <div className="flex items-center gap-1.5">
