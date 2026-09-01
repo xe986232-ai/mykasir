@@ -36,7 +36,7 @@ function Frame({ children }: { children: ReactNode }) {
               }
             : { opacity: 0, transform: "scale(0)" }
         }
-        className="pointer-events-none absolute -bottom-[130px] right-2.5 z-40 h-[260px] w-[260px] rounded-full bg-gradient-to-br from-primary to-primary-dark opacity-90"
+        className="pointer-events-none absolute -bottom-[190px] right-2.5 z-40 h-[380px] w-[380px] rounded-full bg-gradient-to-br from-primary to-primary-dark opacity-90"
       />
 
       <Sidebar />
