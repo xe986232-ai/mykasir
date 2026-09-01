@@ -7,6 +7,7 @@ import { motion, AnimatePresence, PanInfo } from "framer-motion";
 const slides = [
   {
     id: 1,
+    image: "/promo/promo-banner.webp",
     title: "Vegetable Offers",
     discount: "20% OFF",
     date: "10 October, 2025",
@@ -14,13 +15,15 @@ const slides = [
   },
   {
     id: 2,
-    title: "Fresh Fruit Bundle",
+    image: "/promo/promo-banner-kopi.webp",
+    title: "Promo Kopi Sachet",
     discount: "15% OFF",
     date: "14 October, 2025",
     cta: "Get Now",
   },
   {
     id: 3,
+    image: "/promo/promo-banner.webp",
     title: "Dairy Essentials",
     discount: "10% OFF",
     date: "18 October, 2025",
@@ -54,16 +57,6 @@ export default function PromoBanner() {
 
         {/* kartu banner utama */}
         <div className="relative h-[168px] w-full overflow-hidden rounded-3xl shadow-[0_10px_24px_rgba(20,24,20,0.08)]">
-          <Image
-            src="/promo/promo-banner.webp"
-            alt=""
-            fill
-            priority
-            sizes="430px"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/5 to-transparent" />
-
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={slide.id}
@@ -77,7 +70,17 @@ export default function PromoBanner() {
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute inset-0 flex cursor-grab items-center px-5 pt-4 pb-5 active:cursor-grabbing"
             >
-              <div className="z-10 flex h-full flex-col justify-between py-1">
+              <Image
+                src={slide.image}
+                alt=""
+                fill
+                priority={index === 0}
+                sizes="430px"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/5 to-transparent" />
+
+              <div className="relative z-10 flex h-full flex-col justify-between py-1">
                 <div>
                   <p className="text-[13px] font-semibold text-white">
                     {slide.title}
