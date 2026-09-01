@@ -10,6 +10,7 @@ import { ThemeProvider } from "./ThemeContext";
 import CartBottomBar from "./CartBottomBar";
 import CartSheet from "./CartSheet";
 import BulkActionsBar from "./BulkActionsBar";
+import SplashScreen from "./SplashScreen";
 
 // Logic ini persis kayak di kode HTML: pas hamburger di-klik, "main-content"
 // (kartu halaman) di-geser ke kanan sejauh sidebar-width + gap buat
@@ -63,6 +64,10 @@ function Frame({ children }: { children: ReactNode }) {
       <CartBottomBar />
       <CartSheet open={isSheetOpen} onClose={closeSheet} />
       <BulkActionsBar />
+
+      {/* Nutup seluruh Frame pas app pertama kali mount, ilang sendiri
+          abis sekejap. z-[60] biar di atas modal cart/bulk actions (z-50). */}
+      <SplashScreen />
     </div>
   );
 }
