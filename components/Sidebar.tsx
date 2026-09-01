@@ -46,6 +46,8 @@ export const SIDEBAR_GAP = 14;
 // - Section "Master Data": Kelola Produk, Kelola Kategori
 // - Section "Laporan": Riwayat Transaksi
 // href "#" dipakai untuk menu yang belum punya halaman di app Next.js ini.
+// "Kelola Kategori" langsung diarahkan ke halaman Tambah Kategori karena
+// belum ada halaman daftar kategori tersendiri.
 const navSections = [
   {
     label: "Menu",
@@ -58,7 +60,7 @@ const navSections = [
     label: "Master Data",
     items: [
       { label: "Kelola Produk", href: "/produk", Icon: Package },
-      { label: "Kelola Kategori", href: "#", Icon: Tag },
+      { label: "Kelola Kategori", href: "/kategori/tambah", Icon: Tag },
     ],
   },
   {

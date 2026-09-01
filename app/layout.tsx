@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FreshCart — Grocery App",
-  description: "Grocery shopping made simple",
+  title: "Toko — Sistem Kasir",
+  description: "Aplikasi kasir sederhana untuk kelola produk, kategori, dan transaksi",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

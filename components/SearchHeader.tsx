@@ -24,7 +24,7 @@ export default function SearchHeader() {
         <Search size={18} className="text-gray" />
         <input
           type="text"
-          placeholder="Would you like to eat somethings?"
+          placeholder="Cari produk..."
           className="w-full bg-transparent text-[13.5px] text-ink placeholder:text-gray outline-none"
         />
       </div>
