@@ -16,6 +16,14 @@ function Frame({ children }: { children: ReactNode }) {
 
   return (
     <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#EFF1F0]">
+      {/* Lingkaran dekoratif nempel di kanan-bawah. Ditaruh di sini (di luar
+          div yang di-scroll) dan overflow-hidden-nya ada di parent, jadi
+          posisinya beneran diem di layar walau konten di baliknya di-scroll. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-24 -right-20 z-[15] h-[380px] w-[380px] rounded-full bg-gradient-to-br from-primary to-primary-dark"
+      />
+
       <Sidebar />
 
       <div
@@ -32,7 +40,7 @@ function Frame({ children }: { children: ReactNode }) {
             ? `translate3d(${shiftX}px,0,0)`
             : "translate3d(0,0,0)",
         }}
-        className={`absolute left-0 right-0 z-30 flex flex-col overflow-y-auto bg-[#EFF1F0] will-change-transform transition-[transform,top,bottom,border-radius,box-shadow] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`absolute left-0 right-0 z-30 flex flex-col overflow-y-auto will-change-transform transition-[transform,top,bottom,border-radius,box-shadow] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
           isOpen
             ? "top-3 bottom-3 rounded-3xl shadow-[-18px_0px_36px_rgba(0,0,0,0.20)]"
             : "top-0 bottom-0 rounded-none shadow-none"
