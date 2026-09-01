@@ -11,12 +11,12 @@ export default function CartBottomBar({ onOpen }: { onOpen: () => void }) {
     <AnimatePresence>
       {itemCount > 0 && (
         <motion.button
-          initial={{ y: 24, opacity: 0 }}
+          initial={{ y: 90, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 24, opacity: 0 }}
+          exit={{ y: 90, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 26 }}
           onClick={onOpen}
-          className="relative mx-4 mt-4 flex items-center justify-between rounded-2xl bg-primary px-4 py-3.5 shadow-[0_10px_24px_rgba(20,24,20,0.25)] active:scale-[0.98] transition-transform"
+          className="absolute inset-x-0 bottom-0 z-30 flex items-center justify-between rounded-t-3xl bg-primary px-5 py-4 shadow-[0_-8px_24px_rgba(20,24,20,0.2)] active:scale-[0.99] transition-transform"
         >
           <div className="flex items-center gap-2.5">
             <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
