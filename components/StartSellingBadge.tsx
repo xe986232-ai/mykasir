@@ -70,7 +70,7 @@ export default function StartSellingBadge() {
         y: itemCount > 0 ? -78 : 0,
       }}
       transition={{ type: "spring", stiffness: 320, damping: 24 }}
-      className="pointer-events-none absolute inset-x-0 bottom-10 z-30 h-0 w-full"
+      className="pointer-events-none absolute inset-x-0 bottom-20 z-30 h-0 w-full"
     >
       <Link
         href="/kasir"
