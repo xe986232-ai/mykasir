@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
 import SearchHeader from "./SearchHeader";
 import FilterChips from "./FilterChips";
 import StoreRow from "./StoreRow";
@@ -40,6 +43,25 @@ export default function ProdukContent({ initialCategory }: ProdukContentProps) {
 
   return (
     <>
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="flex items-center justify-between px-5 pb-2"
+      >
+        <div>
+          <h1 className="text-[16px] font-bold text-ink">Kelola Produk</h1>
+          <p className="text-[11.5px] text-gray">Tambah &amp; kelola produk tokomu</p>
+        </div>
+        <Link
+          href="/produk/tambah"
+          className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-[12.5px] font-bold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+        >
+          <Plus size={15} strokeWidth={2.6} />
+          Tambah
+        </Link>
+      </motion.div>
+
       <SearchHeader />
       <FilterChips active={activeFilters} onToggle={toggle} />
       <StoreRow />
