@@ -16,7 +16,7 @@ function Frame({ children }: { children: ReactNode }) {
   const shiftX = SIDEBAR_WIDTH + SIDEBAR_GAP;
 
   return (
-    <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden bg-[#EFF1F0]">
+    <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#EFF1F0]">
       <Sidebar />
 
       <AnimatePresence>
@@ -28,7 +28,7 @@ function Frame({ children }: { children: ReactNode }) {
             transition={{ duration: 0.25 }}
             onClick={close}
             style={{ left: SIDEBAR_WIDTH }}
-            className="absolute inset-y-0 right-0 z-20 bg-primary-dark/85"
+            className="absolute inset-y-0 right-0 z-20 bg-gradient-to-b from-primary to-primary-dark"
           />
         )}
       </AnimatePresence>
