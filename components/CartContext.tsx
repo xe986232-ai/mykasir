@@ -39,12 +39,20 @@ type CartContextValue = {
   decrement: (id: number) => void;
   removeItem: (id: number) => void;
   clearCart: () => void;
+  /** Status overlay bottom sheet checkout, dipusatkan di sini biar bisa
+   *  dirender di luar container yang ke-transform (lihat AppShell). */
+  isSheetOpen: boolean;
+  openSheet: () => void;
+  closeSheet: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const openSheet = useCallback(() => setIsSheetOpen(true), []);
+  const closeSheet = useCallback(() => setIsSheetOpen(false), []);
 
   const addItem = useCallback((product: CartableProduct) => {
     setItems((prev) => {
@@ -101,6 +109,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         decrement,
         removeItem,
         clearCart,
+        isSheetOpen,
+        openSheet,
+        closeSheet,
       }}
     >
       {children}

@@ -3,7 +3,9 @@
 import type { ReactNode } from "react";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
-import { CartProvider } from "./CartContext";
+import { CartProvider, useCart } from "./CartContext";
+import CartBottomBar from "./CartBottomBar";
+import CartSheet from "./CartSheet";
 
 // Logic ini persis kayak di kode HTML: pas hamburger di-klik, "main-content"
 // (kartu halaman) di-geser ke kanan sejauh sidebar-width + gap buat
@@ -11,8 +13,16 @@ import { CartProvider } from "./CartContext";
 // Dipakai transisi CSS murni (bukan Framer Motion) biar ringan — sama
 // seperti pendekatan di kode HTML aslinya, cuma pakai `transform` (GPU)
 // buat geser, jadi ga bikin device lag pas buka/tutup.
+//
+// PENTING: elemen apa pun yang punya `transform` (walau translate3d(0,0,0))
+// bikin containing block baru buat descendant `position: fixed` di
+// dalamnya — jadi "fixed" itu keanggep "absolute" relatif ke div ini, ikut
+// kegeser pas discroll. Makanya CartBottomBar & CartSheet SENGAJA dirender
+// di luar div ini (langsung di <Frame>), biar posisi fixed-nya ngunci ke
+// viewport beneran, bukan ke frame yang ke-transform.
 function Frame({ children }: { children: ReactNode }) {
   const { isOpen, close } = useSidebar();
+  const { isSheetOpen, closeSheet } = useCart();
   const shiftX = SIDEBAR_WIDTH + SIDEBAR_GAP;
 
   return (
@@ -41,6 +51,11 @@ function Frame({ children }: { children: ReactNode }) {
       >
         {children}
       </div>
+
+      {/* Di luar div ber-transform di atas → position:fixed di sini beneran
+          ngunci ke viewport, ga ikut kegeser scroll apa pun. */}
+      <CartBottomBar />
+      <CartSheet open={isSheetOpen} onClose={closeSheet} />
     </div>
   );
 }

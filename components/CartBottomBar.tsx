@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "./CartContext";
 
-export default function CartBottomBar({ onOpen }: { onOpen: () => void }) {
-  const { itemCount, subtotal, currency } = useCart();
+export default function CartBottomBar() {
+  const { itemCount, subtotal, currency, openSheet } = useCart();
 
   return (
     <AnimatePresence>
@@ -15,7 +15,7 @@ export default function CartBottomBar({ onOpen }: { onOpen: () => void }) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 90, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 26 }}
-          onClick={onOpen}
+          onClick={openSheet}
           className="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-[430px] items-center justify-between rounded-t-3xl bg-primary px-5 py-4 shadow-[0_-8px_24px_rgba(20,24,20,0.2)] active:scale-[0.99] transition-transform"
         >
           <div className="flex items-center gap-2.5">

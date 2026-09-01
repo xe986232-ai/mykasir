@@ -6,14 +6,11 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import Header from "./Header";
 import Categories from "./Categories";
 import KasirProductSection from "./KasirProductSection";
-import CartBottomBar from "./CartBottomBar";
-import CartSheet from "./CartSheet";
 import type { CategoryId } from "@/lib/products";
 
 export default function KasirContent() {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null);
-  const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <>
@@ -50,9 +47,6 @@ export default function KasirContent() {
 
       <Categories selected={selectedCategory} onSelect={setSelectedCategory} />
       <KasirProductSection selectedCategory={selectedCategory} query={query} />
-
-      <CartBottomBar onOpen={() => setCartOpen(true)} />
-      <CartSheet open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
 }
