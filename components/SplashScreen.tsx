@@ -28,14 +28,19 @@ export default function SplashScreen() {
           transition={{ duration: 0.4, ease: "easeInOut" }}
           className="absolute inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-white"
         >
-          <motion.img
-            src="/jarwoo-logo.svg"
-            alt="Jarwoo"
+          <motion.h1
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-48"
-          />
+            style={{
+              fontFamily: "'Pacifico', cursive",
+              color: "#ea4c89",
+              transform: "rotate(-4deg)",
+            }}
+            className="text-6xl"
+          >
+            Jarwoo
+          </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

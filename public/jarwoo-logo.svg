@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="150" viewBox="0 0 400 150" xmlns:c2pa="http://c2pa.org/manifest">  <style>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="150" viewBox="0 0 400 150" xmlns:c2pa="http://c2pa.org/manifest">  <style><![CDATA[
     @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
     .logo-text {
       font-family: 'Pacifico', cursive;
       font-size: 72px;
       fill: #ea4c89;
     }
-  </style>
+  ]]></style>
   <text x="200" y="90" text-anchor="middle" class="logo-text" transform="rotate(-4 200 90)">Jarwoo</text>
 </svg>
