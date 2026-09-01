@@ -35,7 +35,7 @@ export default function Header() {
         <div>
           <div className="flex items-center gap-1.5">
             <span className="text-[15px] font-bold text-ink leading-none">
-              Muhammad Farhan
+              Jarwo
             </span>
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
               <path
@@ -46,7 +46,6 @@ export default function Header() {
             </svg>
           </div>
           <button className="mt-0.5 flex items-center gap-0.5 text-[12px] text-gray">
-            Dubai, United Arab Emirate
             <ChevronDown size={12} strokeWidth={2.5} />
           </button>
         </div>
