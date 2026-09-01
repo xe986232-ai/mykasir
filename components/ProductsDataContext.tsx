@@ -68,6 +68,7 @@ type ProductRow = {
   icon_key: string | null;
   image: string | null;
   is_active: boolean | null;
+  brand: string | null;
 };
 
 type ProductsDataValue = {
@@ -144,6 +145,7 @@ export function ProductsDataProvider({ children }: { children: ReactNode }) {
         price: formatRupiah(Number(p.price)),
         delivery: p.delivery ?? false,
         category: p.category_id,
+        brand: p.brand,
         Icon: p.icon_key ? productIconMap[p.icon_key] : undefined,
         image: p.image ?? undefined,
       }));

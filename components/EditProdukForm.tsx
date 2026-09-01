@@ -98,6 +98,7 @@ type ProductRow = {
   icon_key: string | null;
   image: string | null;
   is_active: boolean | null;
+  brand: string | null;
 };
 
 export default function EditProdukForm({ productId }: EditProdukFormProps) {
@@ -110,6 +111,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
 
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [brand, setBrand] = useState("");
   const [unit, setUnit] = useState("");
   const [price, setPrice] = useState("");
   const [delivery, setDelivery] = useState(false);
@@ -165,6 +167,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
       const p = data as ProductRow;
       setName(p.name);
       setCategoryId(p.category_id ?? "");
+      setBrand(p.brand ?? "");
       setUnit(p.unit);
       setPrice(String(Number(p.price) || ""));
       setDelivery(p.delivery ?? false);
@@ -206,6 +209,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
         currency: "Rp",
         delivery,
         category_id: categoryId,
+        brand: brand.trim() || null,
         icon_key: image.trim() ? null : iconKey || null,
         image: image.trim() || null,
         is_active: isActive,
@@ -365,6 +369,19 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
                 ))}
               </select>
             )}
+          </div>
+
+          <div className="mb-3">
+            <FieldLabel>Brand</FieldLabel>
+            <input
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              placeholder="Misal: Indomie, Mie Sedaap"
+              className={inputClass}
+            />
+            <p className="mt-1.5 text-[11px] text-gray">
+              Opsional. Isi kalau produk ini mau dikelompokkan bareng produk brand yang sama di halaman utama (misal: kategori Mi Instan dikelompokkan jadi Indomie & Mie Sedaap).
+            </p>
           </div>
 
           <div>

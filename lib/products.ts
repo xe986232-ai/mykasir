@@ -26,6 +26,7 @@ export type Product = {
   price: string; // string tampilan format Rupiah, misal "Rp 15.000"
   delivery?: boolean;
   category: CategoryId;
+  brand?: string | null;
   Icon?: () => React.ReactElement;
   image?: string;
 };

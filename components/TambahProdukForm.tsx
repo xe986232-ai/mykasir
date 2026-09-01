@@ -86,6 +86,7 @@ export default function TambahProdukForm() {
 
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [brand, setBrand] = useState("");
   const [unit, setUnit] = useState("");
   const [price, setPrice] = useState("");
   const [delivery, setDelivery] = useState(false);
@@ -103,6 +104,7 @@ export default function TambahProdukForm() {
   function resetForm() {
     setName("");
     setCategoryId("");
+    setBrand("");
     setUnit("");
     setPrice("");
     setDelivery(false);
@@ -136,6 +138,7 @@ export default function TambahProdukForm() {
       currency: "Rp",
       delivery,
       category_id: categoryId,
+      brand: brand.trim() || null,
       icon_key: image.trim() ? null : iconKey || null,
       image: image.trim() || null,
       is_active: isActive,
@@ -250,6 +253,19 @@ export default function TambahProdukForm() {
                 ))}
               </select>
             )}
+          </div>
+
+          <div className="mb-3">
+            <FieldLabel>Brand</FieldLabel>
+            <input
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              placeholder="Misal: Indomie, Mie Sedaap"
+              className={inputClass}
+            />
+            <p className="mt-1.5 text-[11px] text-gray">
+              Opsional. Isi kalau produk ini mau dikelompokkan bareng produk brand yang sama di halaman utama (misal: kategori Mi Instan dikelompokkan jadi Indomie & Mie Sedaap).
+            </p>
           </div>
 
           <div>
