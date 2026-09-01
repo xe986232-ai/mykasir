@@ -1,9 +1,15 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
-import { CircleBurstProvider, useCircleBurst } from "./CircleBurstContext";
+import {
+  CircleBurstProvider,
+  useCircleBurst,
+  getBurstItemLayout,
+} from "./CircleBurstContext";
 
 // Logic ini persis kayak di kode HTML: pas hamburger di-klik, "main-content"
 // (kartu halaman) di-geser ke kanan sejauh sidebar-width + gap buat
@@ -13,7 +19,7 @@ import { CircleBurstProvider, useCircleBurst } from "./CircleBurstContext";
 // buat geser, jadi ga bikin device lag pas buka/tutup.
 function Frame({ children }: { children: ReactNode }) {
   const { isOpen, close } = useSidebar();
-  const { burstSignal } = useCircleBurst();
+  const { burstSignal, burstItems } = useCircleBurst();
   const shiftX = SIDEBAR_WIDTH + SIDEBAR_GAP;
 
   // burstSignal 0 = belum pernah diklik sama sekali -> jangan animasi pas
@@ -39,6 +45,52 @@ function Frame({ children }: { children: ReactNode }) {
         }
         className="pointer-events-none absolute -bottom-[280px] -right-[280px] z-40 h-[560px] w-[560px] rounded-full bg-gradient-to-br from-primary to-primary-dark opacity-90"
       />
+
+      {/* Logo produk yang barusan di-"+" nempel di pinggir lingkaran dekoratif
+          di atas, tiap logo dikasih card lingkaran putih tipis di belakangnya
+          biar kebaca meski nempel di atas background hijau. Posisinya dihitung
+          dari sudut kanan-bawah yang sama persis dengan lingkaran gede,
+          mengikuti lengkungan pinggirnya (paling baru = paling deket sudut). */}
+      <AnimatePresence initial={false}>
+        {burstItems.map((item, index) => {
+          const { right, bottom, size } = getBurstItemLayout(index);
+          return (
+            <motion.div
+              key={item.id}
+              layout
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              style={{
+                right,
+                bottom,
+                width: size,
+                height: size,
+              }}
+              className="pointer-events-none absolute z-40"
+            >
+              <div className="flex h-full w-full items-center justify-center rounded-full bg-white p-[3px] shadow-[0_4px_10px_rgba(20,24,20,0.22)]">
+                <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white">
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      width={size}
+                      height={size}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : item.Icon ? (
+                    <div className="h-[72%] w-[72%]">
+                      <item.Icon />
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
 
       <Sidebar />
 

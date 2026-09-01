@@ -8,13 +8,14 @@ import type { Product } from "@/lib/products";
 import { useCircleBurst } from "./CircleBurstContext";
 
 export default function ProductCard({
+  id,
   name,
   unit,
   price,
   delivery,
   Icon,
   image,
-}: Omit<Product, "id" | "category">) {
+}: Omit<Product, "category">) {
   const [added, setAdded] = useState(false);
   const { burst } = useCircleBurst();
 
@@ -60,7 +61,7 @@ export default function ProductCard({
           aria-label={`Add ${name} to cart`}
           onClick={() => {
             setAdded(true);
-            burst();
+            burst({ id, name, image, Icon });
           }}
           whileTap={{ scale: 0.85 }}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-white"
