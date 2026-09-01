@@ -42,40 +42,42 @@ export default function KasirProductCard(product: Omit<Product, "category">) {
       </button>
 
       <p className="mt-1 text-[13.5px] font-extrabold text-ink">{price}</p>
-      <p className="truncate text-[12px] font-medium text-ink">{name}</p>
-      <p className="text-[10.5px] text-gray">{unit}</p>
+      <div className="mt-1 flex items-end justify-between gap-1">
+        <div className="min-w-0">
+          <p className="truncate text-[12px] font-medium text-ink">{name}</p>
+          <p className="text-[10.5px] text-gray">{unit}</p>
+        </div>
 
-      <div className="mt-2">
         {qty === 0 ? (
           <button
             onClick={() => addItem(product)}
-            className="flex w-full items-center justify-center gap-1 rounded-xl bg-primary py-2 text-[12px] font-bold text-white active:scale-[0.97] transition-transform"
+            aria-label={`Tambah ${name} ke keranjang`}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-white active:scale-90 transition-transform"
           >
-            <Plus size={13} strokeWidth={2.8} />
-            Tambah
+            <Plus size={14} strokeWidth={2.8} />
           </button>
         ) : (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex items-center justify-between rounded-xl bg-primary-light px-1 py-1"
+            className="flex shrink-0 items-center gap-1 rounded-full bg-primary-light px-1 py-1"
           >
             <button
               onClick={() => decrement(product.id)}
               aria-label={`Kurangi ${name}`}
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-primary shadow-sm active:scale-90 transition-transform"
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-primary shadow-sm active:scale-90 transition-transform"
             >
-              <Minus size={13} strokeWidth={2.8} />
+              <Minus size={12} strokeWidth={2.8} />
             </button>
-            <span className="text-[13px] font-bold text-primary-dark">
+            <span className="w-4 text-center text-[12px] font-bold text-primary-dark">
               {qty}
             </span>
             <button
               onClick={() => increment(product.id)}
               aria-label={`Tambah ${name}`}
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-sm active:scale-90 transition-transform"
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white shadow-sm active:scale-90 transition-transform"
             >
-              <Plus size={13} strokeWidth={2.8} />
+              <Plus size={12} strokeWidth={2.8} />
             </button>
           </motion.div>
         )}

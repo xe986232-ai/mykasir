@@ -16,7 +16,7 @@ const paymentMethods: { id: PaymentMethod; label: string; Icon: typeof Banknote 
 ];
 
 function formatMoney(value: number, currency: string) {
-  return `${value.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
+  return `${currency} ${Math.round(value).toLocaleString("id-ID")}`;
 }
 
 export default function CartSheet({
@@ -215,7 +215,7 @@ export default function CartSheet({
                       inputMode="decimal"
                       value={cashInput}
                       onChange={(e) => setCashInput(e.target.value)}
-                      placeholder="0.00"
+                      placeholder="0"
                       className="mt-2 w-full rounded-2xl bg-white px-4 py-3 text-[15px] font-bold text-ink shadow-[0_2px_8px_rgba(20,24,20,0.05)] outline-none placeholder:text-gray"
                     />
                   </div>

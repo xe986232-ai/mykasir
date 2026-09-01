@@ -15,7 +15,7 @@ export type CartableProduct = {
   id: number;
   name: string;
   unit: string;
-  price: string; // string tampilan asli, misal "6.50 AED"
+  price: string; // string tampilan asli, misal "Rp 15.000"
   image?: string;
   Icon?: () => React.ReactElement;
 };
@@ -87,7 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => items.reduce((sum, it) => sum + it.priceValue * it.qty, 0),
     [items]
   );
-  const currency = items[0]?.currency ?? "AED";
+  const currency = items[0]?.currency ?? "Rp";
 
   return (
     <CartContext.Provider
