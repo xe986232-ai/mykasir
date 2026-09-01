@@ -20,7 +20,8 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="h-14 w-14 shrink-0 animate-pulse rounded-2xl bg-white/70"
+            style={{ width: "calc((100% - 48px) / 5)" }}
+            className="h-14 shrink-0 animate-pulse rounded-2xl bg-white/70"
           />
         ))}
       </div>
@@ -32,9 +33,9 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, delay: 0.15, ease: "easeOut" }}
-      className="mt-6 px-5"
+      className="mt-6"
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {categories.map((cat) => {
           const isActive = selected === cat.id;
           return (
@@ -42,7 +43,8 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
               key={cat.id}
               onClick={() => onSelect(isActive ? null : cat.id)}
               aria-pressed={isActive}
-              className="flex w-[58px] flex-col items-center gap-2 active:scale-95 transition-transform"
+              style={{ width: "calc((100% - 48px) / 5)" }}
+              className="flex shrink-0 flex-col items-center gap-2 active:scale-95 transition-transform"
             >
               <div
                 className={`flex h-14 w-14 items-center justify-center rounded-2xl transition-shadow ${
@@ -82,7 +84,7 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
 
       <button
         onClick={() => onSelect(null)}
-        className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-[13px] font-semibold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
+        className="mx-5 mt-5 flex w-[calc(100%-40px)] items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-[13px] font-semibold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
       >
         <LayoutGrid size={16} className="text-primary" />
         {selected ? "Show All Categories" : "View More Categories"}
