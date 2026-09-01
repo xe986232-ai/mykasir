@@ -18,9 +18,11 @@ import StartSellingBadge from "./StartSellingBadge";
 // PENTING: elemen apa pun yang punya `transform` (walau translate3d(0,0,0))
 // bikin containing block baru buat descendant `position: fixed` di
 // dalamnya — jadi "fixed" itu keanggep "absolute" relatif ke div ini, ikut
-// kegeser pas discroll. Makanya CartBottomBar & CartSheet SENGAJA dirender
-// di luar div ini (langsung di <Frame>), biar posisi fixed-nya ngunci ke
-// viewport beneran, bukan ke frame yang ke-transform.
+// kegeser pas discroll. Makanya CartBottomBar, StartSellingBadge & CartSheet
+// SENGAJA dirender di luar div ini (langsung di <Frame>, yang "relative" &
+// h-dvh), pakai `position: absolute` (BUKAN fixed) biar nempel ke bottom
+// Frame yang tingginya udah pas — ga kepotong sama address bar/gesture-nav
+// browser kayak yang kejadian kalau pakai `fixed`.
 function Frame({ children }: { children: ReactNode }) {
   const { isOpen, close } = useSidebar();
   const { isSheetOpen, closeSheet } = useCart();

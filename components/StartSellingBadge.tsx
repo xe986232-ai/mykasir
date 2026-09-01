@@ -36,9 +36,14 @@ const LOGOS: Logo[] = [
 const CYCLE_MS = 2200;
 
 // Badge mengambang "Mulai Jual" di pojok kanan-bawah halaman utama, ngarah
-// ke /kasir. Dirender langsung di AppShell (di luar div ber-transform),
-// biar posisi fixed-nya beneran ngunci ke viewport, sama kayak
-// CartBottomBar — dan cuma tampil di halaman utama ("/").
+// ke /kasir. Dirender langsung di AppShell, di luar div ber-transform.
+//
+// PENTING: pakai `absolute` (nempel ke bottom Frame yang udah h-dvh),
+// BUKAN `position: fixed`. Fixed itu ngukur ke "layout viewport" browser,
+// yang di Chrome/Android sering lebih tinggi dari area yang keliatan
+// (gara-gara address bar / gesture-nav bar), jadi elemen fixed-bottom
+// suka kepotong / ketutupan di ujung layar. Absolute relatif ke Frame
+// (yang tingginya udah pas dvh) ga kena masalah itu.
 export default function StartSellingBadge() {
   const { itemCount } = useCart();
   const pathname = usePathname();
@@ -65,8 +70,7 @@ export default function StartSellingBadge() {
         y: itemCount > 0 ? -78 : 0,
       }}
       transition={{ type: "spring", stiffness: 320, damping: 24 }}
-      className="pointer-events-none fixed bottom-5 z-30 h-0 w-full max-w-[430px]"
-      style={{ left: "50%", translate: "-50% 0" }}
+      className="pointer-events-none absolute inset-x-0 bottom-5 z-30 h-0 w-full"
     >
       <Link
         href="/kasir"
