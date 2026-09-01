@@ -7,7 +7,10 @@ import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
 
 // Logic ini persis kayak di kode HTML: pas hamburger di-klik, "main-content"
 // (kartu halaman) di-geser ke kanan sejauh sidebar-width + gap buat
-// nampilin sidebar di belakangnya, sudutnya jadi rounded + dikasih shadow.
+// nampilin sidebar di belakangnya. Sudutnya jadi rounded semua (atas &
+// bawah) plus dikasih sedikit ruang/jarak di atas & bawah, sama seperti
+// `.main-content.shifted{ top:...; bottom:12px; border-radius:24px }`
+// di kode aslinya.
 function Frame({ children }: { children: ReactNode }) {
   const { isOpen, close } = useSidebar();
   const shiftX = SIDEBAR_WIDTH + SIDEBAR_GAP;
@@ -33,13 +36,23 @@ function Frame({ children }: { children: ReactNode }) {
       <motion.div
         animate={
           isOpen
-            ? { x: shiftX, borderRadius: 24 }
-            : { x: 0, borderRadius: 0 }
+            ? {
+                x: shiftX,
+                top: 12,
+                bottom: 12,
+                borderRadius: 24,
+                boxShadow: "-18px 0px 36px rgba(0,0,0,0.20)",
+              }
+            : {
+                x: 0,
+                top: 0,
+                bottom: 0,
+                borderRadius: 0,
+                boxShadow: "0px 0px 0px rgba(0,0,0,0)",
+              }
         }
         transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-        className={`relative z-30 flex min-h-screen w-full flex-col bg-[#EFF1F0] ${
-          isOpen ? "shadow-[-18px_0_36px_rgba(0,0,0,0.20)]" : ""
-        }`}
+        className="absolute left-0 right-0 z-30 flex flex-col overflow-y-auto bg-[#EFF1F0]"
       >
         {children}
       </motion.div>
