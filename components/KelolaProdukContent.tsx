@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  CheckCircle2,
+  Circle,
   Loader2,
   Package,
   Pencil,
@@ -12,10 +14,13 @@ import {
   Search,
   Tag,
   Trash2,
+  X,
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData, productIconMap } from "./ProductsDataContext";
+
+const LONG_PRESS_MS = 480;
 
 type AdminProductRow = {
   id: number;
@@ -40,6 +45,83 @@ export default function KelolaProdukContent() {
   const [deleteTarget, setDeleteTarget] = useState<AdminProductRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [version, setVersion] = useState(0);
+
+  // Mode seleksi massal: aktif kalau kartu produk ditahan (long-press).
+  // Selama aktif, tap kartu lain tinggal toggle checkbox-nya.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+
+  const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFiredRef = useRef(false);
+
+  function clearPressTimer() {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+  }
+
+  function handlePointerDown(id: number) {
+    longPressFiredRef.current = false;
+    clearPressTimer();
+    pressTimerRef.current = setTimeout(() => {
+      longPressFiredRef.current = true;
+      pressTimerRef.current = null;
+      setSelectMode(true);
+      setSelectedIds((prev) => new Set(prev).add(id));
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate(15);
+      }
+    }, LONG_PRESS_MS);
+  }
+
+  function toggleSelect(id: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function handleCardClick(id: number) {
+    if (longPressFiredRef.current) {
+      // Klik ini masih bagian dari gesture long-press yang sama, jadi
+      // jangan di-toggle lagi biar ga langsung kebalik ke unselect.
+      longPressFiredRef.current = false;
+      return;
+    }
+    if (selectMode) {
+      toggleSelect(id);
+    }
+  }
+
+  function exitSelectMode() {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  }
+
+  async function handleBulkDelete() {
+    if (selectedIds.size === 0) return;
+    setBulkDeleting(true);
+    const { error: deleteError } = await supabase
+      .from("products")
+      .delete()
+      .in("id", Array.from(selectedIds));
+    setBulkDeleting(false);
+
+    if (deleteError) {
+      setError(deleteError.message || "Gagal menghapus produk terpilih.");
+      setShowBulkConfirm(false);
+      return;
+    }
+
+    setShowBulkConfirm(false);
+    exitSelectMode();
+    refetchAll();
+  }
 
   // Berbeda dari halaman /produk (yang cuma nampilin produk is_active =
   // true buat browse), di sini kita ambil SEMUA produk (aktif & nonaktif)
@@ -112,33 +194,73 @@ export default function KelolaProdukContent() {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex items-center justify-between px-5 pb-2"
-      >
-        <div>
-          <h1 className="text-[16px] font-bold text-ink">Kelola Produk</h1>
-          <p className="text-[11.5px] text-gray">Tambah, edit, atau hapus produk tokomu</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/kategori/tambah"
-            aria-label="Tambah kategori"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+      <AnimatePresence mode="wait" initial={false}>
+        {selectMode ? (
+          <motion.div
+            key="select-header"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="flex items-center justify-between px-5 pb-2"
           >
-            <Tag size={16} className="text-ink" />
-          </Link>
-          <Link
-            href="/produk/kelola/tambah"
-            className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-[12.5px] font-bold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+            <button
+              onClick={exitSelectMode}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+              aria-label="Batal pilih"
+            >
+              <X size={16} className="text-ink" />
+            </button>
+            <p className="text-[13px] font-bold text-ink">
+              {selectedIds.size} produk dipilih
+            </p>
+            <button
+              onClick={() => selectedIds.size > 0 && setShowBulkConfirm(true)}
+              disabled={selectedIds.size === 0}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-badge/10 text-badge shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform disabled:opacity-40"
+              aria-label="Hapus produk terpilih"
+            >
+              <Trash2 size={16} />
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="normal-header"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="flex items-center justify-between px-5 pb-2"
           >
-            <Plus size={15} strokeWidth={2.6} />
-            Tambah
-          </Link>
-        </div>
-      </motion.div>
+            <div>
+              <h1 className="text-[16px] font-bold text-ink">Kelola Produk</h1>
+              <p className="text-[11.5px] text-gray">Tambah, edit, atau hapus produk tokomu</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/kategori/tambah"
+                aria-label="Tambah kategori"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+              >
+                <Tag size={16} className="text-ink" />
+              </Link>
+              <Link
+                href="/produk/kelola/tambah"
+                className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-[12.5px] font-bold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+              >
+                <Plus size={15} strokeWidth={2.6} />
+                Tambah
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {!selectMode && (
+        <p className="px-5 pb-1 text-[10.5px] text-gray/70">
+          Tahan kartu produk untuk memilih beberapa sekaligus.
+        </p>
+      )}
 
       {/* Search */}
       <motion.div
@@ -183,6 +305,7 @@ export default function KelolaProdukContent() {
           {filtered.map((p) => {
             const category = getCategoryById(p.category_id);
             const Icon = p.icon_key ? productIconMap[p.icon_key] : undefined;
+            const isSelected = selectedIds.has(p.id);
 
             return (
               <motion.div
@@ -192,8 +315,33 @@ export default function KelolaProdukContent() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.2 }}
-                className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-[0_2px_10px_rgba(20,24,20,0.06)]"
+                onPointerDown={() => handlePointerDown(p.id)}
+                onPointerUp={clearPressTimer}
+                onPointerLeave={clearPressTimer}
+                onPointerCancel={clearPressTimer}
+                onClick={() => handleCardClick(p.id)}
+                className={`flex items-center gap-3 rounded-2xl bg-white p-3 shadow-[0_2px_10px_rgba(20,24,20,0.06)] transition-colors ${
+                  isSelected ? "ring-2 ring-primary bg-primary-light/30" : ""
+                } ${selectMode ? "select-none" : ""}`}
               >
+                <AnimatePresence initial={false}>
+                  {selectMode && (
+                    <motion.div
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: "auto", opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      transition={{ duration: 0.18 }}
+                      className="flex shrink-0 items-center overflow-hidden"
+                    >
+                      {isSelected ? (
+                        <CheckCircle2 size={22} className="text-primary" />
+                      ) : (
+                        <Circle size={22} className="text-gray/35" />
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-light/60">
                   {p.image ? (
                     <Image
@@ -230,27 +378,37 @@ export default function KelolaProdukContent() {
                   </p>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-1.5">
-                  <Link
-                    href={`/produk/kelola/${p.id}/edit`}
-                    aria-label={`Edit ${p.name}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-light/70 text-ink active:scale-90 transition-transform"
-                  >
-                    <Pencil size={15} />
-                  </Link>
-                  <button
-                    onClick={() => setDeleteTarget(p)}
-                    aria-label={`Hapus ${p.name}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-badge/10 text-badge active:scale-90 transition-transform"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
+                {!selectMode && (
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <Link
+                      href={`/produk/kelola/${p.id}/edit`}
+                      aria-label={`Edit ${p.name}`}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-light/70 text-ink active:scale-90 transition-transform"
+                    >
+                      <Pencil size={15} />
+                    </Link>
+                    <button
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteTarget(p);
+                      }}
+                      aria-label={`Hapus ${p.name}`}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-badge/10 text-badge active:scale-90 transition-transform"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                )}
               </motion.div>
             );
           })}
         </AnimatePresence>
       </div>
+
+      {selectMode && <div className="h-20" />}
 
       {/* Modal konfirmasi hapus */}
       <AnimatePresence>
@@ -315,6 +473,93 @@ export default function KelolaProdukContent() {
           dikelompokkan.
         </p>
       )}
+
+      {/* Bar aksi hapus massal, muncul selama mode seleksi aktif */}
+      <AnimatePresence>
+        {selectMode && (
+          <motion.div
+            initial={{ y: 90, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 90, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 26 }}
+            className="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-[430px] items-center justify-between rounded-t-3xl bg-white px-5 py-4 shadow-[0_-8px_24px_rgba(20,24,20,0.15)]"
+          >
+            <button
+              onClick={exitSelectMode}
+              className="text-[12.5px] font-semibold text-gray active:scale-95 transition-transform"
+            >
+              Batal
+            </button>
+            <span className="text-[12.5px] font-semibold text-ink">
+              {selectedIds.size} dipilih
+            </span>
+            <button
+              onClick={() => selectedIds.size > 0 && setShowBulkConfirm(true)}
+              disabled={selectedIds.size === 0}
+              className="flex items-center gap-1.5 rounded-full bg-badge px-4 py-2.5 text-[12.5px] font-bold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform disabled:opacity-40"
+            >
+              <Trash2 size={14} />
+              Hapus
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal konfirmasi hapus massal */}
+      <AnimatePresence>
+        {showBulkConfirm && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !bulkDeleting && setShowBulkConfirm(false)}
+              className="fixed inset-0 z-50 bg-black/40"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              transition={{ type: "spring", damping: 26, stiffness: 320 }}
+              className="fixed inset-x-6 top-1/2 z-50 mx-auto max-w-[380px] -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl"
+            >
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-badge/10">
+                <Trash2 size={20} className="text-badge" />
+              </div>
+              <h2 className="mt-3 text-center text-[14.5px] font-bold text-ink">
+                Hapus {selectedIds.size} produk?
+              </h2>
+              <p className="mt-1 text-center text-[12px] text-gray">
+                Produk yang dipilih akan dihapus permanen dan tidak bisa dikembalikan.
+              </p>
+
+              <div className="mt-5 flex gap-2.5">
+                <button
+                  onClick={() => setShowBulkConfirm(false)}
+                  disabled={bulkDeleting}
+                  className="flex-1 rounded-2xl bg-gray-light py-3 text-[13px] font-bold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleting}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-badge py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-60"
+                >
+                  {bulkDeleting ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Menghapus...
+                    </>
+                  ) : (
+                    "Ya, Hapus"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

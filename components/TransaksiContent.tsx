@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Banknote,
+  CheckCircle2,
   ChevronDown,
+  Circle,
+  Loader2,
   QrCode,
   Receipt,
   RefreshCw,
+  Trash2,
   Wallet,
+  X,
 } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
 import AnimatedNumber from "./AnimatedNumber";
@@ -35,6 +40,8 @@ type TransactionRow = {
   transaction_items: TransactionItemRow[];
 };
 
+const LONG_PRESS_MS = 480;
+
 const paymentMeta: Record<string, { label: string; Icon: typeof Banknote }> = {
   cash: { label: "Tunai", Icon: Banknote },
   qris: { label: "QRIS", Icon: QrCode },
@@ -53,8 +60,53 @@ function formatDateTime(iso: string) {
 
 // Header sederhana, konsisten sama gaya header halaman lain (tombol
 // hamburger bulat putih) tapi tanpa profil user — cuma judul halaman.
-function TransaksiHeader({ onRefresh, loading }: { onRefresh: () => void; loading: boolean }) {
+function TransaksiHeader({
+  onRefresh,
+  loading,
+  selectMode,
+  selectedCount,
+  onExitSelectMode,
+  onRequestBulkDelete,
+}: {
+  onRefresh: () => void;
+  loading: boolean;
+  selectMode: boolean;
+  selectedCount: number;
+  onExitSelectMode: () => void;
+  onRequestBulkDelete: () => void;
+}) {
   const { toggle } = useSidebar();
+
+  if (selectMode) {
+    return (
+      <motion.header
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="flex items-center justify-between px-5 pt-2"
+      >
+        <button
+          onClick={onExitSelectMode}
+          aria-label="Batal pilih"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+        >
+          <X size={16} className="text-ink" />
+        </button>
+        <span className="text-[13px] font-bold text-ink">
+          {selectedCount} transaksi dipilih
+        </span>
+        <button
+          onClick={onRequestBulkDelete}
+          disabled={selectedCount === 0}
+          aria-label="Hapus transaksi terpilih"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-badge/10 text-badge shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform disabled:opacity-40"
+        >
+          <Trash2 size={16} />
+        </button>
+      </motion.header>
+    );
+  }
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -12 }}
@@ -111,22 +163,95 @@ function SummaryCards({ transactions }: { transactions: TransactionRow[] }) {
   );
 }
 
-function TransactionCard({ trx, delay }: { trx: TransactionRow; delay: number }) {
+function TransactionCard({
+  trx,
+  delay,
+  selectMode,
+  selected,
+  onLongPress,
+  onToggleSelect,
+}: {
+  trx: TransactionRow;
+  delay: number;
+  selectMode: boolean;
+  selected: boolean;
+  onLongPress: (id: string) => void;
+  onToggleSelect: (id: string) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
   const meta = paymentMeta[trx.payment_method] ?? { label: trx.payment_method, Icon: Wallet };
   const itemCount = trx.transaction_items.reduce((sum, it) => sum + it.qty, 0);
+
+  const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFiredRef = useRef(false);
+
+  function clearPressTimer() {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+  }
+
+  function handlePointerDown() {
+    longPressFiredRef.current = false;
+    clearPressTimer();
+    pressTimerRef.current = setTimeout(() => {
+      longPressFiredRef.current = true;
+      pressTimerRef.current = null;
+      onLongPress(trx.id);
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate(15);
+      }
+    }, LONG_PRESS_MS);
+  }
+
+  function handleHeaderClick() {
+    if (longPressFiredRef.current) {
+      longPressFiredRef.current = false;
+      return;
+    }
+    if (selectMode) {
+      onToggleSelect(trx.id);
+    } else {
+      setExpanded((v) => !v);
+    }
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay, ease: "easeOut" }}
-      className="rounded-2xl bg-white p-3.5 shadow-[0_2px_10px_rgba(20,24,20,0.06)]"
+      onPointerDown={handlePointerDown}
+      onPointerUp={clearPressTimer}
+      onPointerLeave={clearPressTimer}
+      onPointerCancel={clearPressTimer}
+      className={`rounded-2xl bg-white p-3.5 shadow-[0_2px_10px_rgba(20,24,20,0.06)] transition-colors ${
+        selected ? "ring-2 ring-primary bg-primary-light/30" : ""
+      } ${selectMode ? "select-none" : ""}`}
     >
       <button
-        onClick={() => setExpanded((v) => !v)}
+        onClick={handleHeaderClick}
         className="flex w-full items-center gap-3 text-left"
       >
+        <AnimatePresence initial={false}>
+          {selectMode && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: "auto", opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="flex shrink-0 items-center overflow-hidden"
+            >
+              {selected ? (
+                <CheckCircle2 size={22} className="text-primary" />
+              ) : (
+                <Circle size={22} className="text-gray/35" />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-light">
           <meta.Icon size={17} className="text-primary" strokeWidth={2} />
         </div>
@@ -144,10 +269,12 @@ function TransactionCard({ trx, delay }: { trx: TransactionRow; delay: number })
           <span className="text-[13.5px] font-extrabold text-ink">
             {formatRupiah(Number(trx.subtotal))}
           </span>
-          <ChevronDown
-            size={16}
-            className={`shrink-0 text-gray transition-transform ${expanded ? "rotate-180" : ""}`}
-          />
+          {!selectMode && (
+            <ChevronDown
+              size={16}
+              className={`shrink-0 text-gray transition-transform ${expanded ? "rotate-180" : ""}`}
+            />
+          )}
         </div>
       </button>
 
@@ -205,6 +332,68 @@ export default function TransaksiContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Mode seleksi massal: aktif kalau kartu transaksi ditahan (long-press).
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+
+  function handleLongPress(id: string) {
+    setSelectMode(true);
+    setSelectedIds((prev) => new Set(prev).add(id));
+  }
+
+  function handleToggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function exitSelectMode() {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  }
+
+  async function handleBulkDelete() {
+    if (selectedIds.size === 0) return;
+    setBulkDeleting(true);
+    const ids = Array.from(selectedIds);
+
+    // Hapus dulu transaction_items yang nunjuk ke transaksi terpilih,
+    // baru transaksinya sendiri — jaga-jaga kalau FK di Supabase belum
+    // di-set ON DELETE CASCADE.
+    const { error: itemsError } = await supabase
+      .from("transaction_items")
+      .delete()
+      .in("transaction_id", ids);
+
+    if (itemsError) {
+      setBulkDeleting(false);
+      setError(itemsError.message || "Gagal menghapus transaksi terpilih.");
+      setShowBulkConfirm(false);
+      return;
+    }
+
+    const { error: deleteError } = await supabase
+      .from("transactions")
+      .delete()
+      .in("id", ids);
+    setBulkDeleting(false);
+
+    if (deleteError) {
+      setError(deleteError.message || "Gagal menghapus transaksi terpilih.");
+      setShowBulkConfirm(false);
+      return;
+    }
+
+    setShowBulkConfirm(false);
+    exitSelectMode();
+    load();
+  }
+
   async function load() {
     setLoading(true);
     setError(null);
@@ -238,10 +427,22 @@ export default function TransaksiContent() {
 
   return (
     <>
-      <TransaksiHeader onRefresh={load} loading={loading} />
+      <TransaksiHeader
+        onRefresh={load}
+        loading={loading}
+        selectMode={selectMode}
+        selectedCount={selectedIds.size}
+        onExitSelectMode={exitSelectMode}
+        onRequestBulkDelete={() => selectedIds.size > 0 && setShowBulkConfirm(true)}
+      />
+      {!selectMode && transactions.length > 0 && (
+        <p className="px-5 pt-1.5 text-[10.5px] text-gray/70">
+          Tahan kartu transaksi untuk memilih beberapa sekaligus.
+        </p>
+      )}
       <SummaryCards transactions={transactions} />
 
-      <div className="mt-4 flex flex-col gap-2.5 px-5 pb-6">
+      <div className={`mt-4 flex flex-col gap-2.5 px-5 ${selectMode ? "pb-24" : "pb-6"}`}>
         {loading && transactions.length === 0 && (
           <p className="py-10 text-center text-[12.5px] text-gray">Memuat transaksi...</p>
         )}
@@ -258,9 +459,104 @@ export default function TransaksiContent() {
         )}
 
         {transactions.map((trx, i) => (
-          <TransactionCard key={trx.id} trx={trx} delay={0.05 + i * 0.03} />
+          <TransactionCard
+            key={trx.id}
+            trx={trx}
+            delay={0.05 + i * 0.03}
+            selectMode={selectMode}
+            selected={selectedIds.has(trx.id)}
+            onLongPress={handleLongPress}
+            onToggleSelect={handleToggleSelect}
+          />
         ))}
       </div>
+
+      {/* Bar aksi hapus massal, muncul selama mode seleksi aktif */}
+      <AnimatePresence>
+        {selectMode && (
+          <motion.div
+            initial={{ y: 90, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 90, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 26 }}
+            className="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-[430px] items-center justify-between rounded-t-3xl bg-white px-5 py-4 shadow-[0_-8px_24px_rgba(20,24,20,0.15)]"
+          >
+            <button
+              onClick={exitSelectMode}
+              className="text-[12.5px] font-semibold text-gray active:scale-95 transition-transform"
+            >
+              Batal
+            </button>
+            <span className="text-[12.5px] font-semibold text-ink">
+              {selectedIds.size} dipilih
+            </span>
+            <button
+              onClick={() => selectedIds.size > 0 && setShowBulkConfirm(true)}
+              disabled={selectedIds.size === 0}
+              className="flex items-center gap-1.5 rounded-full bg-badge px-4 py-2.5 text-[12.5px] font-bold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform disabled:opacity-40"
+            >
+              <Trash2 size={14} />
+              Hapus
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal konfirmasi hapus massal */}
+      <AnimatePresence>
+        {showBulkConfirm && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !bulkDeleting && setShowBulkConfirm(false)}
+              className="fixed inset-0 z-50 bg-black/40"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              transition={{ type: "spring", damping: 26, stiffness: 320 }}
+              className="fixed inset-x-6 top-1/2 z-50 mx-auto max-w-[380px] -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl"
+            >
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-badge/10">
+                <Trash2 size={20} className="text-badge" />
+              </div>
+              <h2 className="mt-3 text-center text-[14.5px] font-bold text-ink">
+                Hapus {selectedIds.size} transaksi?
+              </h2>
+              <p className="mt-1 text-center text-[12px] text-gray">
+                Transaksi yang dipilih akan dihapus permanen dan tidak bisa dikembalikan.
+              </p>
+
+              <div className="mt-5 flex gap-2.5">
+                <button
+                  onClick={() => setShowBulkConfirm(false)}
+                  disabled={bulkDeleting}
+                  className="flex-1 rounded-2xl bg-gray-light py-3 text-[13px] font-bold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleting}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-badge py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-60"
+                >
+                  {bulkDeleting ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Menghapus...
+                    </>
+                  ) : (
+                    "Ya, Hapus"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
