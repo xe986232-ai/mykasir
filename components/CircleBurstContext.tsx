@@ -18,7 +18,7 @@ export type BurstProduct = {
 };
 
 /** Maksimal berapa logo produk yang nangkring bareng di pinggir lingkaran sekaligus. */
-export const MAX_BURST_ITEMS = 6;
+export const MAX_BURST_ITEMS = 4;
 
 type CircleBurstContextValue = {
   /** Berubah tiap kali burst() dipanggil — dipakai sebagai `key` biar animasi CSS-nya restart dari awal. */
@@ -75,10 +75,10 @@ export function useCircleBurst() {
  * digeser tiap index biar nyebar ngikutin pinggiran lingkaran gede. index 0 =
  * produk paling baru diklik, ditaruh paling deket sudut.
  */
-const BURST_RADIUS = 240; // digeser lebih ke pinggir/sudut, deket rim lingkaran gede
-const BURST_ANGLE_START = 16; // derajat, 0° = lurus ke kiri
-const BURST_ANGLE_STEP = 11; // jarak sudut antar logo
-export const BURST_ITEM_SIZE = 52; // ukuran sama rata buat semua logo
+const BURST_RADIUS = 232; // digeser lebih ke pinggir/sudut, deket rim lingkaran gede
+const BURST_ANGLE_START = 18; // derajat, 0° = lurus ke kiri
+const BURST_ANGLE_STEP = 17; // jarak sudut antar logo — cuma 4 slot jadi dilebarin dikit
+export const BURST_ITEM_SIZE = 70; // ukuran sama rata buat semua logo, lebih gede
 
 export function getBurstItemLayout(index: number) {
   const angleDeg = BURST_ANGLE_START + index * BURST_ANGLE_STEP;

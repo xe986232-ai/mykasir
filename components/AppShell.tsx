@@ -68,25 +68,21 @@ function Frame({ children }: { children: ReactNode }) {
                 width: size,
                 height: size,
               }}
-              className="pointer-events-none absolute z-40"
+              className="pointer-events-none absolute z-40 flex items-center justify-center overflow-hidden rounded-full bg-white/35 shadow-[0_4px_10px_rgba(20,24,20,0.16)]"
             >
-              <div className="flex h-full w-full items-center justify-center rounded-full bg-white/40 p-[2px] shadow-[0_3px_8px_rgba(20,24,20,0.15)] backdrop-blur-[1px]">
-                <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white/70">
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      width={size}
-                      height={size}
-                      className="h-full w-full scale-110 object-contain"
-                    />
-                  ) : item.Icon ? (
-                    <div className="h-[88%] w-[88%]">
-                      <item.Icon />
-                    </div>
-                  ) : null}
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={size}
+                  height={size}
+                  className="h-full w-full scale-110 object-contain"
+                />
+              ) : item.Icon ? (
+                <div className="h-[88%] w-[88%]">
+                  <item.Icon />
                 </div>
-              </div>
+              ) : null}
             </motion.div>
           );
         })}
