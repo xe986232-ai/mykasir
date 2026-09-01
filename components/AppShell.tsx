@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
+import { CircleBurstProvider, useCircleBurst } from "./CircleBurstContext";
 
 // Logic ini persis kayak di kode HTML: pas hamburger di-klik, "main-content"
 // (kartu halaman) di-geser ke kanan sejauh sidebar-width + gap buat
@@ -12,16 +13,29 @@ import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
 // buat geser, jadi ga bikin device lag pas buka/tutup.
 function Frame({ children }: { children: ReactNode }) {
   const { isOpen, close } = useSidebar();
+  const { burstSignal } = useCircleBurst();
   const shiftX = SIDEBAR_WIDTH + SIDEBAR_GAP;
+
+  // burstSignal 0 = belum pernah diklik sama sekali -> jangan animasi pas
+  // pertama kali render, biar ga muncul "pop" pas halaman baru dibuka.
+  const hasBurst = burstSignal > 0;
 
   return (
     <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#EFF1F0]">
-      {/* Lingkaran dekoratif nempel di kanan-bawah, sebagai overlay di
-          DEPAN konten (bukan di belakang) — jadi posisinya tetap diem
-          walau konten discroll, dan gak bikin sidebar ikutan tembus. */}
+      {/* Lingkaran dekoratif: cuma kepotong di sisi BAWAH (jadi bentuknya
+          separo lingkaran yang mulus), lalu digeser ke kanan lewat `right`
+          positif (bukan negatif) supaya sisi kanannya gak ikut kepotong. */}
       <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-24 -right-20 z-40 h-[380px] w-[380px] rounded-full bg-gradient-to-br from-primary to-primary-dark opacity-90"
+        key={burstSignal}
+        style={
+          hasBurst
+            ? {
+                animation:
+                  "circle-burst 0.6s cubic-bezier(0.34,1.56,0.64,1) 1",
+              }
+            : undefined
+        }
+        className="pointer-events-none absolute -bottom-[160px] right-5 z-40 h-[320px] w-[320px] rounded-full bg-gradient-to-br from-primary to-primary-dark opacity-90"
       />
 
       <Sidebar />
@@ -55,7 +69,9 @@ function Frame({ children }: { children: ReactNode }) {
 export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
-      <Frame>{children}</Frame>
+      <CircleBurstProvider>
+        <Frame>{children}</Frame>
+      </CircleBurstProvider>
     </SidebarProvider>
   );
 }

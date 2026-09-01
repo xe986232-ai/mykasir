@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Plus, Truck } from "lucide-react";
 import type { Product } from "@/lib/products";
+import { useCircleBurst } from "./CircleBurstContext";
 
 export default function ProductCard({
   name,
@@ -15,6 +16,7 @@ export default function ProductCard({
   image,
 }: Omit<Product, "id" | "category">) {
   const [added, setAdded] = useState(false);
+  const { burst } = useCircleBurst();
 
   return (
     <div className="relative overflow-hidden rounded-2xl bg-white p-3 shadow-[0_2px_10px_rgba(20,24,20,0.06)]">
@@ -56,7 +58,10 @@ export default function ProductCard({
 
         <motion.button
           aria-label={`Add ${name} to cart`}
-          onClick={() => setAdded(true)}
+          onClick={() => {
+            setAdded(true);
+            burst();
+          }}
           whileTap={{ scale: 0.85 }}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-white"
           style={{ backgroundColor: added ? "#1F9D3F" : "#2FB350" }}
