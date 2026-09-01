@@ -6,6 +6,7 @@ import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
 import { CartProvider, useCart } from "./CartContext";
 import CartBottomBar from "./CartBottomBar";
 import CartSheet from "./CartSheet";
+import StartSellingBadge from "./StartSellingBadge";
 
 // Logic ini persis kayak di kode HTML: pas hamburger di-klik, "main-content"
 // (kartu halaman) di-geser ke kanan sejauh sidebar-width + gap buat
@@ -54,6 +55,7 @@ function Frame({ children }: { children: ReactNode }) {
 
       {/* Di luar div ber-transform di atas → position:fixed di sini beneran
           ngunci ke viewport, ga ikut kegeser scroll apa pun. */}
+      <StartSellingBadge />
       <CartBottomBar />
       <CartSheet open={isSheetOpen} onClose={closeSheet} />
     </div>
