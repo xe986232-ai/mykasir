@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { LayoutGrid } from "lucide-react";
 import type { CategoryId } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
-import { MorphingInfinity } from "./MorphingInfinity";
 
 type CategoriesProps = {
   selected: CategoryId | null;
@@ -15,12 +14,12 @@ type CategoriesProps = {
 export default function Categories({ selected, onSelect }: CategoriesProps) {
   const { categories, loading } = useProductsData();
 
+  // Sengaja ga render loading di sini — biar ga dobel sama LoadingScreen
+  // full-frame yang udah ditampilin ProductSection/KasirProductSection
+  // (yang mantau `loading` flag yang sama). Pas data belum ada, section
+  // di bawahnya yang ngurus tampilan loading tunggal.
   if (loading && categories.length === 0) {
-    return (
-      <div className="mt-6 flex h-14 items-center justify-center px-5">
-        <MorphingInfinity className="h-8 w-8 text-primary" />
-      </div>
-    );
+    return null;
   }
 
   return (

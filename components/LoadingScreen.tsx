@@ -3,26 +3,25 @@ import { MorphingInfinity } from "./MorphingInfinity";
 type LoadingScreenProps = {
   /** Teks kecil di bawah icon, opsional. */
   label?: string;
-  /** Override tinggi area loading, default nge-fill sisa layar biar center bener. */
-  className?: string;
-  /** Ukuran icon (tailwind size classes), default h-10 w-10. */
+  /** Ukuran icon (tailwind size classes), default gede: h-16 w-16. */
   iconClassName?: string;
 };
 
-// Dipakai buat SEMUA state loading full-section/full-page di seluruh app
-// (memuat produk, kategori, transaksi, detail produk, dll) supaya
-// posisinya konsisten: bener-bener di tengah area kontennya.
+// Loading tunggal buat seluruh app: nempel "fixed" tapi karena kena trik
+// containing-block dari AppShell (parent-nya punya `transform`), posisinya
+// jadi relatif ke frame app, BUKAN ke viewport browser — jadi tetep bener
+// di tengah-tengah (titik 0,0 dari frame, horizontal & vertikal) dan ga
+// ikut kegeser pas discroll. Cuma satu titik ini yang boleh dipakein
+// loading per halaman, biar ga dobel sama komponen lain yang mantau
+// `loading` flag yang sama.
 export default function LoadingScreen({
   label,
-  className = "",
-  iconClassName = "h-10 w-10",
+  iconClassName = "h-16 w-16",
 }: LoadingScreenProps) {
   return (
-    <div
-      className={`flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center ${className}`}
-    >
+    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-[#EFF1F0] text-center">
       <MorphingInfinity className={`${iconClassName} text-primary`} />
-      {label && <p className="text-[12px] text-gray">{label}</p>}
+      {label && <p className="text-[13px] text-gray">{label}</p>}
     </div>
   );
 }

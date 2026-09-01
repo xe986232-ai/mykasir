@@ -303,7 +303,7 @@ export default function KelolaProdukContent() {
       {/* List */}
       <div className="mt-4 flex flex-col gap-2.5 px-5 pb-6">
         {loading && rows.length === 0 && (
-          <LoadingScreen label="Memuat produk..." className="py-8" />
+          <LoadingScreen label="Memuat produk..." />
         )}
 
         {error && (

@@ -465,7 +465,7 @@ export default function TransaksiContent() {
 
       <div className={`mt-4 flex flex-col gap-2.5 px-5 ${selectMode ? "pb-24" : "pb-6"}`}>
         {loading && transactions.length === 0 && (
-          <LoadingScreen label="Memuat transaksi..." className="py-10" />
+          <LoadingScreen label="Memuat transaksi..." />
         )}
 
         {error && (
