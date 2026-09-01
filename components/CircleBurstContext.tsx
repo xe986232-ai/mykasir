@@ -68,20 +68,21 @@ export function useCircleBurst() {
 }
 
 /**
- * Hitung posisi (dari sudut kanan-bawah container) + ukuran tiap logo produk
- * yang nangkring di pinggir lingkaran. Radius-nya SENGAJA dibikin konstan buat
+ * Hitung posisi (dari sudut kanan-bawah container) tiap logo produk yang
+ * nangkring di pinggir lingkaran. Radius-nya SENGAJA dibikin konstan buat
  * semua item — biar titik tengah tiap logo bener-bener jatuh di satu lingkaran
  * yang sama (lengkungannya presisi, gak nekuk/bengkok), cuma sudutnya aja yang
  * digeser tiap index biar nyebar ngikutin pinggiran lingkaran gede. index 0 =
- * produk paling baru diklik, ditaruh paling deket sudut & paling gede.
+ * produk paling baru diklik, ditaruh paling deket sudut.
  */
-const BURST_RADIUS = 224; // jarak konstan tiap logo dari titik sudut lingkaran
-const BURST_ANGLE_START = 12; // derajat, 0° = lurus ke kiri
-const BURST_ANGLE_STEP = 13.6; // jarak sudut antar logo, biar nyebar rata sampai ~80°
+const BURST_RADIUS = 240; // digeser lebih ke pinggir/sudut, deket rim lingkaran gede
+const BURST_ANGLE_START = 16; // derajat, 0° = lurus ke kiri
+const BURST_ANGLE_STEP = 11; // jarak sudut antar logo
+export const BURST_ITEM_SIZE = 52; // ukuran sama rata buat semua logo
 
 export function getBurstItemLayout(index: number) {
   const angleDeg = BURST_ANGLE_START + index * BURST_ANGLE_STEP;
-  const size = 58 - index * 4;
+  const size = BURST_ITEM_SIZE;
 
   const rad = (angleDeg * Math.PI) / 180;
   const right = BURST_RADIUS * Math.cos(rad) - size / 2;
