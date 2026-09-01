@@ -1,34 +1,37 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 /**
- * Bungkus angka/teks (harga, qty, kembalian, dll) yang nilainya sering
- * berubah, biar transisinya ga kaku — tiap kali `value` berubah, teks lama
- * geser+fade keluar dan yang baru geser+fade masuk (efek mirip odometer).
- * Dipakai di CartBottomBar & CartSheet buat total harga, qty, kembalian.
+ * Animasiin angka (harga, qty, kembalian, dll) biar transisinya beneran
+ * "ngerol" halus pas nilainya berubah — bukan cuma ganti teks kaku.
+ * Pakai spring buat nge-tween nilai numeriknya sendiri, terus tiap frame
+ * di-format ulang jadi string (mata uang / angka biasa) lewat `format`.
  */
 export default function AnimatedNumber({
   value,
+  format,
   className,
 }: {
-  value: string | number;
+  value: number;
+  /** Fungsi format angka mentah -> string tampilan, misal "Rp 32.000". */
+  format?: (value: number) => string;
   className?: string;
 }) {
-  return (
-    <span className={`relative inline-grid overflow-hidden ${className ?? ""}`}>
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span
-          key={value}
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -10, opacity: 0, position: "absolute" }}
-          transition={{ type: "spring", stiffness: 420, damping: 32 }}
-          className="col-start-1 row-start-1"
-        >
-          {value}
-        </motion.span>
-      </AnimatePresence>
-    </span>
+  const motionValue = useMotionValue(value);
+  const spring = useSpring(motionValue, {
+    stiffness: 140,
+    damping: 22,
+    mass: 0.7,
+  });
+  const display = useTransform(spring, (v) =>
+    format ? format(v) : Math.round(v).toLocaleString("id-ID")
   );
+
+  useEffect(() => {
+    motionValue.set(value);
+  }, [value, motionValue]);
+
+  return <motion.span className={className}>{display}</motion.span>;
 }

@@ -131,7 +131,8 @@ export default function CartSheet({
                             </p>
                             <p className="text-[11.5px] font-bold text-primary">
                               <AnimatedNumber
-                                value={formatMoney(item.priceValue * item.qty, item.currency)}
+                                value={item.priceValue * item.qty}
+                                format={(v) => formatMoney(v, item.currency)}
                               />
                             </p>
                           </div>
@@ -172,7 +173,10 @@ export default function CartSheet({
                     <div className="flex items-center justify-between">
                       <span className="text-[12.5px] text-gray">Subtotal</span>
                       <span className="text-[15px] font-extrabold text-ink">
-                        <AnimatedNumber value={formatMoney(subtotal, currency)} />
+                        <AnimatedNumber
+                          value={subtotal}
+                          format={(v) => formatMoney(v, currency)}
+                        />
                       </span>
                     </div>
                     <button
@@ -228,7 +232,10 @@ export default function CartSheet({
                   <div className="flex items-center justify-between">
                     <span className="text-[12.5px] text-gray">Total Tagihan</span>
                     <span className="text-[13.5px] font-bold text-ink">
-                      <AnimatedNumber value={formatMoney(subtotal, currency)} />
+                      <AnimatedNumber
+                        value={subtotal}
+                        format={(v) => formatMoney(v, currency)}
+                      />
                     </span>
                   </div>
                   {method === "cash" && (
@@ -239,7 +246,10 @@ export default function CartSheet({
                           change < 0 ? "text-badge" : "text-primary"
                         }`}
                       >
-                        <AnimatedNumber value={formatMoney(Math.max(change, 0), currency)} />
+                        <AnimatedNumber
+                          value={Math.max(change, 0)}
+                          format={(v) => formatMoney(v, currency)}
+                        />
                       </span>
                     </div>
                   )}

@@ -26,12 +26,13 @@ export default function CartBottomBar() {
                 <AnimatedNumber value={itemCount} />
               </span>
             </div>
-            <span className="text-[12.5px] font-semibold text-white/90">
+            <span className="flex items-center gap-1 text-[12.5px] font-semibold text-white/90">
               <AnimatedNumber value={itemCount} /> item
             </span>
           </div>
           <AnimatedNumber
-            value={`${currency} ${Math.round(subtotal).toLocaleString("id-ID")}`}
+            value={subtotal}
+            format={(v) => `${currency} ${Math.round(v).toLocaleString("id-ID")}`}
             className="text-[13.5px] font-extrabold text-white"
           />
         </motion.button>
