@@ -5,14 +5,39 @@
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-  --color-primary: #2fb350;
-  --color-primary-dark: #229140;
-  --color-primary-light: #e8f6ea;
+  /* Warna "aksen" (tombol, harga, ring, ikon aktif) & "sidebar" (nav kiri)
+     adalah dua warna utama tiap palet. --color-page adalah bg netral yang
+     ikut menyesuaikan nuansa (hangat/dingin) tiap palet. Nilai di bawah ini
+     adalah default palet "Emerald" — palet lain override lewat [data-theme]. */
+  --color-sidebar: #0f6e56;
+  --color-sidebar-dark: #085041;
+  --color-primary: #d97706;
+  --color-primary-light: #fbefd9;
+  --color-page: #f3eee3;
+
   --color-ink: #1b1d1f;
   --color-gray: #8a9099;
   --color-gray-light: #f2f3f5;
   --color-badge: #ef4444;
   --color-delivery: #3b6df0;
+}
+
+/* Palet 2 — Navy + lime: sidebar biru gelap, aksen hijau lime */
+[data-theme="navy"] {
+  --color-sidebar: #1e3a5f;
+  --color-sidebar-dark: #122a47;
+  --color-primary: #65a30d;
+  --color-primary-light: #eef6e1;
+  --color-page: #eef1f5;
+}
+
+/* Palet 3 — Charcoal + terracotta: sidebar abu gelap, aksen terracotta */
+[data-theme="charcoal"] {
+  --color-sidebar: #2c2c2a;
+  --color-sidebar-dark: #1a1a19;
+  --color-primary: #c2410c;
+  --color-primary-light: #fceee7;
+  --color-page: #f1efea;
 }
 
 html, body {

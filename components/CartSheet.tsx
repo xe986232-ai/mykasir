@@ -119,7 +119,7 @@ export default function CartSheet({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 32, stiffness: 320 }}
-            className="absolute inset-x-0 bottom-0 z-50 flex max-h-[85%] flex-col rounded-t-3xl bg-[#EFF1F0]"
+            className="absolute inset-x-0 bottom-0 z-50 flex max-h-[85%] flex-col rounded-t-3xl bg-page"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 pt-4 pb-2">
@@ -223,7 +223,7 @@ export default function CartSheet({
                 </div>
 
                 {items.length > 0 && (
-                  <div className="border-t border-black/5 bg-[#EFF1F0] px-5 pb-6 pt-3">
+                  <div className="border-t border-black/5 bg-page px-5 pb-6 pt-3">
                     <div className="flex items-center justify-between">
                       <span className="text-[12.5px] text-gray">Subtotal</span>
                       <span className="text-[15px] font-extrabold text-ink">

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingCart, Package, ListChecks, Tag, FileText } from "lucide-react";
+import { ShoppingCart, Package, ListChecks, Tag, FileText, Settings } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
 
 // Icon dashboard di kode HTML aslinya pakai 4 lingkaran (bukan 4 kotak
@@ -68,6 +68,10 @@ const navSections = [
     label: "Laporan",
     items: [{ label: "Riwayat Transaksi", href: "/transaksi", Icon: FileText }],
   },
+  {
+    label: "Lainnya",
+    items: [{ label: "Pengaturan", href: "/pengaturan", Icon: Settings }],
+  },
 ];
 
 export default function Sidebar() {
@@ -86,7 +90,7 @@ export default function Sidebar() {
   return (
     <aside
       style={{ width: SIDEBAR_WIDTH }}
-      className="absolute inset-y-0 left-0 z-10 flex flex-col overflow-y-auto bg-gradient-to-b from-primary to-primary-dark"
+      className="absolute inset-y-0 left-0 z-10 flex flex-col overflow-y-auto bg-gradient-to-b from-sidebar to-sidebar-dark"
     >
       <div className="flex items-center gap-3 border-b border-white/15 p-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15">

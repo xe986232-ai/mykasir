@@ -43,7 +43,7 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
               <div
                 className={`flex h-14 w-14 items-center justify-center rounded-2xl transition-shadow ${
                   isActive
-                    ? "ring-2 ring-primary ring-offset-2 ring-offset-[#EFF1F0]"
+                    ? "ring-2 ring-primary ring-offset-2 ring-offset-page"
                     : ""
                 }`}
               >

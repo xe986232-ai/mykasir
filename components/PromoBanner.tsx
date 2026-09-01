@@ -207,7 +207,7 @@ export default function PromoBanner() {
         </div>
 
         {/* potongan kecil di tengah-bawah banner, tempat dot slider nangkring */}
-        <div className="absolute left-1/2 bottom-0 z-20 flex -translate-x-1/2 translate-y-1/2 items-center gap-1.5 rounded-full bg-[#EFF1F0] px-3 py-1.5 shadow-[0_2px_6px_rgba(20,24,20,0.10)]">
+        <div className="absolute left-1/2 bottom-0 z-20 flex -translate-x-1/2 translate-y-1/2 items-center gap-1.5 rounded-full bg-page px-3 py-1.5 shadow-[0_2px_6px_rgba(20,24,20,0.10)]">
           {slides.map((s, i) => (
             <button
               key={s.id}
