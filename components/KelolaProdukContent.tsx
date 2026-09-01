@@ -257,8 +257,8 @@ export default function KelolaProdukContent() {
             </div>
             <div className="flex items-center gap-2">
               <Link
-                href="/kategori/tambah"
-                aria-label="Tambah kategori"
+                href="/kategori/kelola"
+                aria-label="Kelola kategori"
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
               >
                 <Tag size={16} className="text-ink" />

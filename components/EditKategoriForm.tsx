@@ -4,15 +4,15 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { ArrowLeft, Check, ImageOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Check, ImageOff, Trash2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useProductsData } from "./ProductsDataContext";
 import { MorphingInfinity } from "./MorphingInfinity";
+import LoadingScreen from "./LoadingScreen";
 
-// Icon bawaan yang beneran punya komponen React di ProductsDataContext
-// (lihat categoryIconMap di sana). Kalau nanti nambah icon baru, tambahin
-// juga di categoryIconMap + di sini biar konsisten.
+// Sama seperti di TambahKategoriForm — icon_key bawaan yang punya komponen
+// icon di ProductsDataContext (categoryIconMap).
 const availableIconKeys = [
   { key: "fruits", label: "Buah-buahan" },
   { key: "vegetable", label: "Sayuran" },
@@ -35,26 +35,30 @@ function FieldLabel({ children, required }: { children: string; required?: boole
 const inputClass =
   "w-full rounded-xl border border-black/[0.06] bg-gray-light/60 px-3.5 py-3 text-[13.5px] text-ink outline-none placeholder:text-gray focus:border-primary/50 focus:bg-white";
 
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
+type EditKategoriFormProps = {
+  categoryId: string;
+};
 
-export default function TambahKategoriForm() {
+type CategoryRow = {
+  id: string;
+  label: string;
+  type: "image" | "icon";
+  image: string | null;
+  bg_color: string | null;
+  icon_key: string | null;
+  sort_order: number;
+};
+
+export default function EditKategoriForm({ categoryId }: EditKategoriFormProps) {
   const router = useRouter();
   const { refetch } = useProductsData();
 
-  const [existingIds, setExistingIds] = useState<string[]>([]);
-  const [nextSortOrder, setNextSortOrder] = useState(1);
-  const [loadingExisting, setLoadingExisting] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [productCount, setProductCount] = useState(0);
 
   const [label, setLabel] = useState("");
-  const [id, setId] = useState("");
-  const [idTouched, setIdTouched] = useState(false);
   const [displayType, setDisplayType] = useState<DisplayType>("icon");
   const [image, setImage] = useState("");
   const [imageError, setImageError] = useState(false);
@@ -66,69 +70,71 @@ export default function TambahKategoriForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Ambil daftar id kategori yang udah ada (buat validasi duplikat) +
-  // sort_order tertinggi (buat nyaranin urutan berikutnya).
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Ambil data kategori yang mau diedit + jumlah produk yang masih
+  // memakainya (buat peringatan sebelum hapus).
   useEffect(() => {
     let cancelled = false;
+
     async function load() {
+      setLoading(true);
+      setLoadError(null);
+
       if (!isSupabaseConfigured) {
-        setLoadingExisting(false);
+        setLoadError(
+          "Supabase belum dikonfigurasi. Set NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY di environment variables."
+        );
+        setLoading(false);
         return;
       }
-      const { data } = await supabase.from("categories").select("id, sort_order");
-      if (cancelled || !data) return;
-      const ids = data.map((r: { id: string }) => r.id);
-      const maxSort = data.reduce(
-        (max: number, r: { sort_order: number | null }) => Math.max(max, r.sort_order ?? 0),
-        0
-      );
-      setExistingIds(ids);
-      const suggested = maxSort + 1;
-      setNextSortOrder(suggested);
-      setSortOrder(String(suggested));
-      setLoadingExisting(false);
+
+      const [catRes, countRes] = await Promise.all([
+        supabase.from("categories").select("*").eq("id", categoryId).single(),
+        supabase
+          .from("products")
+          .select("id", { count: "exact", head: true })
+          .eq("category_id", categoryId),
+      ]);
+
+      if (cancelled) return;
+
+      if (catRes.error || !catRes.data) {
+        if (catRes.error?.code === "PGRST116") {
+          setNotFound(true);
+        } else {
+          setLoadError(catRes.error?.message ?? "Gagal memuat data kategori.");
+        }
+        setLoading(false);
+        return;
+      }
+
+      const c = catRes.data as CategoryRow;
+      setLabel(c.label);
+      setDisplayType(c.type);
+      setImage(c.image ?? "");
+      setIconKey(c.icon_key ?? availableIconKeys[0].key);
+      setBgColor(c.bg_color ?? swatches[0]);
+      setSortOrder(String(c.sort_order ?? 1));
+      setProductCount(countRes.count ?? 0);
+      setLoading(false);
     }
+
     load();
     return () => {
       cancelled = true;
     };
-  }, []);
-
-  function handleLabelChange(value: string) {
-    setLabel(value);
-    if (!idTouched) setId(slugify(value));
-  }
-
-  function resetForm() {
-    setLabel("");
-    setId("");
-    setIdTouched(false);
-    setDisplayType("icon");
-    setImage("");
-    setImageError(false);
-    setIconKey(availableIconKeys[0].key);
-    setBgColor(swatches[0]);
-    const suggested = nextSortOrder + 1;
-    setNextSortOrder(suggested);
-    setSortOrder(String(suggested));
-    setExistingIds((prev) => [...prev, id]);
-  }
+  }, [categoryId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
-    const cleanId = id.trim();
     const sortValue = parseInt(sortOrder, 10);
 
     if (!label.trim()) return setError("Nama kategori wajib diisi.");
-    if (!cleanId) return setError("ID kategori wajib diisi.");
-    if (!/^[a-z0-9-]+$/.test(cleanId)) {
-      return setError("ID kategori cuma boleh huruf kecil, angka, dan tanda strip (-).");
-    }
-    if (existingIds.includes(cleanId)) {
-      return setError(`ID "${cleanId}" udah dipakai kategori lain. Pakai ID lain.`);
-    }
     if (displayType === "image" && !image.trim()) {
       return setError("URL gambar wajib diisi kalau tipe tampilannya Gambar.");
     }
@@ -142,24 +148,73 @@ export default function TambahKategoriForm() {
     }
 
     setSaving(true);
-    const { error: insertError } = await supabase.from("categories").insert({
-      id: cleanId,
-      label: label.trim(),
-      type: displayType,
-      image: displayType === "image" ? image.trim() : null,
-      bg_color: displayType === "icon" ? bgColor : null,
-      icon_key: displayType === "icon" ? iconKey : null,
-      sort_order: sortValue,
-    });
+    const { error: updateError } = await supabase
+      .from("categories")
+      .update({
+        label: label.trim(),
+        type: displayType,
+        image: displayType === "image" ? image.trim() : null,
+        bg_color: displayType === "icon" ? bgColor : null,
+        icon_key: displayType === "icon" ? iconKey : null,
+        sort_order: sortValue,
+      })
+      .eq("id", categoryId);
     setSaving(false);
 
-    if (insertError) {
-      setError(insertError.message || "Gagal menyimpan kategori ke Supabase.");
+    if (updateError) {
+      setError(updateError.message || "Gagal menyimpan perubahan kategori.");
       return;
     }
 
     refetch();
     setSuccess(true);
+  }
+
+  async function handleConfirmDelete() {
+    setDeleting(true);
+    setDeleteError(null);
+
+    const { error: deleteErr } = await supabase.from("categories").delete().eq("id", categoryId);
+    setDeleting(false);
+
+    if (deleteErr) {
+      setDeleteError(deleteErr.message || "Gagal menghapus kategori.");
+      return;
+    }
+
+    refetch();
+    router.push("/kategori/kelola");
+  }
+
+  if (loading) {
+    return <LoadingScreen label="Memuat data kategori..." />;
+  }
+
+  if (notFound) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 pt-24 text-center">
+        <p className="text-[14px] font-bold text-ink">Kategori tidak ditemukan</p>
+        <p className="mt-1.5 text-[12.5px] text-gray">
+          Kategori ini mungkin sudah dihapus sebelumnya.
+        </p>
+        <Link
+          href="/kategori/kelola"
+          className="mt-6 rounded-2xl bg-primary px-6 py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-transform"
+        >
+          Kembali ke Kelola Kategori
+        </Link>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="px-5 pt-8">
+        <p className="rounded-xl bg-badge/10 px-3.5 py-3 text-[12px] font-medium text-badge">
+          {loadError}
+        </p>
+      </div>
+    );
   }
 
   if (success) {
@@ -172,26 +227,23 @@ export default function TambahKategoriForm() {
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-light">
           <Check size={30} className="text-primary" strokeWidth={2.5} />
         </div>
-        <h1 className="mt-5 text-[17px] font-bold text-ink">Kategori tersimpan!</h1>
+        <h1 className="mt-5 text-[17px] font-bold text-ink">Kategori diperbarui!</h1>
         <p className="mt-1.5 text-[13px] text-gray">
-          &ldquo;{label}&rdquo; berhasil ditambahkan ke daftar kategori.
+          Perubahan pada &ldquo;{label}&rdquo; berhasil disimpan.
         </p>
 
         <div className="mt-7 flex w-full flex-col gap-2.5">
           <button
-            onClick={() => {
-              resetForm();
-              setSuccess(false);
-            }}
+            onClick={() => router.push("/kategori/kelola")}
             className="w-full rounded-2xl bg-primary py-3.5 text-[13.5px] font-bold text-white active:scale-[0.98] transition-transform"
           >
-            Tambah Kategori Lain
+            Kembali ke Kelola Kategori
           </button>
           <button
-            onClick={() => router.push("/kategori/kelola")}
+            onClick={() => setSuccess(false)}
             className="w-full rounded-2xl bg-white py-3.5 text-[13.5px] font-bold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
           >
-            Kembali ke Kelola Kategori
+            Lanjut Edit Kategori Ini
           </button>
         </div>
       </motion.div>
@@ -214,8 +266,8 @@ export default function TambahKategoriForm() {
           <ArrowLeft size={18} className="text-ink" />
         </Link>
         <div>
-          <h1 className="text-[15px] font-bold text-ink">Tambah Kategori</h1>
-          <p className="text-[11.5px] text-gray">Buat kategori baru untuk produk tokomu</p>
+          <h1 className="text-[15px] font-bold text-ink">Edit Kategori</h1>
+          <p className="text-[11.5px] text-gray">Perbarui data &ldquo;{label}&rdquo;</p>
         </div>
       </motion.div>
 
@@ -234,32 +286,18 @@ export default function TambahKategoriForm() {
             <FieldLabel required>Nama Kategori</FieldLabel>
             <input
               value={label}
-              onChange={(e) => handleLabelChange(e.target.value)}
+              onChange={(e) => setLabel(e.target.value)}
               placeholder="Misal: Buah-buahan"
               className={inputClass}
             />
           </div>
 
           <div>
-            <FieldLabel required>ID Kategori</FieldLabel>
-            <input
-              value={id}
-              onChange={(e) => {
-                setIdTouched(true);
-                setId(slugify(e.target.value));
-              }}
-              placeholder="misal: buah-buahan"
-              className={inputClass}
-            />
+            <FieldLabel>ID Kategori</FieldLabel>
+            <input value={categoryId} disabled className={`${inputClass} opacity-60`} />
             <p className="mt-1.5 text-[11px] text-gray">
-              Otomatis dibuat dari nama, tapi bisa diubah. Huruf kecil, angka, strip (-) saja —
-              dipakai sebagai ID unik di database.
+              ID kategori tidak bisa diubah karena dipakai sebagai kunci relasi ke produk.
             </p>
-            {!loadingExisting && id && existingIds.includes(id) && (
-              <p className="mt-1 text-[11px] font-semibold text-badge">
-                ID ini sudah dipakai kategori lain.
-              </p>
-            )}
           </div>
         </section>
 
@@ -324,7 +362,9 @@ export default function TambahKategoriForm() {
                       onClick={() => setBgColor(c)}
                       style={{ backgroundColor: c }}
                       className={`h-6 w-6 shrink-0 rounded-full transition-transform active:scale-90 ${
-                        bgColor.toLowerCase() === c.toLowerCase() ? "ring-2 ring-offset-2 ring-ink/40" : ""
+                        bgColor.toLowerCase() === c.toLowerCase()
+                          ? "ring-2 ring-offset-2 ring-ink/40"
+                          : ""
                       }`}
                     />
                   ))}
@@ -374,9 +414,7 @@ export default function TambahKategoriForm() {
             onChange={(e) => setSortOrder(e.target.value.replace(/[^\d]/g, ""))}
             className={inputClass}
           />
-          <p className="mt-1.5 text-[11px] text-gray">
-            Angka lebih kecil tampil lebih dulu. Disarankan: {nextSortOrder}.
-          </p>
+          <p className="mt-1.5 text-[11px] text-gray">Angka lebih kecil tampil lebih dulu.</p>
         </section>
 
         {error && (
@@ -396,10 +434,97 @@ export default function TambahKategoriForm() {
               Menyimpan...
             </>
           ) : (
-            "Simpan Kategori"
+            "Simpan Perubahan"
           )}
         </button>
+
+        {/* Zona berbahaya: hapus kategori */}
+        <section className="mt-2 rounded-2xl border border-dashed border-badge/30 bg-badge/5 p-4">
+          <h2 className="mb-1 text-[13px] font-bold text-badge">Zona Berbahaya</h2>
+          <p className="mb-3 text-[11px] text-gray">
+            {productCount > 0
+              ? `Kategori ini masih dipakai ${productCount} produk. Kalau dihapus, produk tersebut akan jadi "Tanpa kategori".`
+              : "Kategori yang dihapus tidak bisa dikembalikan lagi."}
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-[13px] font-bold text-badge shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
+          >
+            <Trash2 size={15} />
+            Hapus Kategori Ini
+          </button>
+        </section>
       </motion.form>
+
+      {/* Modal konfirmasi hapus */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !deleting && setShowDeleteConfirm(false)}
+              className="absolute inset-0 z-50 bg-black/40"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              transition={{ type: "spring", damping: 26, stiffness: 320 }}
+              className="absolute inset-x-6 top-1/2 z-50 -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl"
+            >
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-badge/10">
+                <Trash2 size={20} className="text-badge" />
+              </div>
+              <h2 className="mt-3 text-center text-[14.5px] font-bold text-ink">
+                Hapus kategori ini?
+              </h2>
+              <p className="mt-1 text-center text-[12px] text-gray">
+                &ldquo;{label}&rdquo; akan dihapus permanen dan tidak bisa dikembalikan.
+                {productCount > 0 && (
+                  <>
+                    {" "}
+                    <span className="font-semibold text-badge">{productCount} produk</span> yang
+                    masih pakai kategori ini akan jadi &ldquo;Tanpa kategori&rdquo;.
+                  </>
+                )}
+              </p>
+
+              {deleteError && (
+                <p className="mt-3 rounded-xl bg-badge/10 px-3 py-2 text-center text-[11.5px] font-medium text-badge">
+                  {deleteError}
+                </p>
+              )}
+
+              <div className="mt-5 flex gap-2.5">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleting}
+                  className="flex-1 rounded-2xl bg-gray-light py-3 text-[13px] font-bold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleConfirmDelete}
+                  disabled={deleting}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-badge py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-60"
+                >
+                  {deleting ? (
+                    <>
+                      <MorphingInfinity className="h-3.5 w-3.5" />
+                      Menghapus...
+                    </>
+                  ) : (
+                    "Ya, Hapus"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
