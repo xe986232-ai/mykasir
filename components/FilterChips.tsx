@@ -1,8 +1,9 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpDown, SlidersHorizontal } from "lucide-react";
-import { categories } from "@/lib/products";
+import { useProductsData } from "./ProductsDataContext";
 
 type FilterItem = {
   id: string;
@@ -16,17 +17,18 @@ const staticFilters: FilterItem[] = [
   { id: "stores", label: "Stores" },
 ];
 
-const filters: FilterItem[] = [
-  ...staticFilters,
-  ...categories.map((c) => ({ id: c.id, label: c.label })),
-];
-
 type FilterChipsProps = {
   active: string[];
   onToggle: (id: string) => void;
 };
 
 export default function FilterChips({ active, onToggle }: FilterChipsProps) {
+  const { categories } = useProductsData();
+  const filters: FilterItem[] = useMemo(
+    () => [...staticFilters, ...categories.map((c) => ({ id: c.id, label: c.label }))],
+    [categories]
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -6 }}

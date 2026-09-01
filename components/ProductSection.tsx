@@ -3,13 +3,22 @@
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "./ProductCard";
 import CategoryRow from "./CategoryRow";
-import { categories, products, getCategoryById, type CategoryId } from "@/lib/products";
+import type { CategoryId } from "@/lib/products";
+import { useProductsData } from "./ProductsDataContext";
 
 type ProductSectionProps = {
   selectedCategory: CategoryId | null;
 };
 
 export default function ProductSection({ selectedCategory }: ProductSectionProps) {
+  const { categories, products, getCategoryById, loading } = useProductsData();
+
+  if (loading && products.length === 0) {
+    return (
+      <p className="mt-6 px-5 text-center text-[12px] text-gray">Memuat produk...</p>
+    );
+  }
+
   if (selectedCategory) {
     const category = getCategoryById(selectedCategory);
     const filtered = products.filter((p) => p.category === selectedCategory);

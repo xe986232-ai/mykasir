@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
 import { CartProvider, useCart } from "./CartContext";
+import { ProductsDataProvider } from "./ProductsDataContext";
 import CartBottomBar from "./CartBottomBar";
 import CartSheet from "./CartSheet";
 
@@ -64,10 +65,12 @@ function Frame({ children }: { children: ReactNode }) {
 
 export default function AppShell({ children }: { children: ReactNode }) {
   return (
-    <SidebarProvider>
-      <CartProvider>
-        <Frame>{children}</Frame>
-      </CartProvider>
-    </SidebarProvider>
+    <ProductsDataProvider>
+      <SidebarProvider>
+        <CartProvider>
+          <Frame>{children}</Frame>
+        </CartProvider>
+      </SidebarProvider>
+    </ProductsDataProvider>
   );
 }

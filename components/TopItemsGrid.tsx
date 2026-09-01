@@ -4,7 +4,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "./ProductCard";
 import CategoryRow from "./CategoryRow";
-import { categories, products, type CategoryId } from "@/lib/products";
+import type { CategoryId } from "@/lib/products";
+import { useProductsData } from "./ProductsDataContext";
 
 const INITIAL_COUNT = 6;
 
@@ -15,8 +16,15 @@ type TopItemsGridProps = {
 
 export default function TopItemsGrid({ activeCategoryIds, deliveryOnly }: TopItemsGridProps) {
   const [expanded, setExpanded] = useState(false);
+  const { categories, products, loading } = useProductsData();
 
   const base = deliveryOnly ? products.filter((p) => p.delivery) : products;
+
+  if (loading && products.length === 0) {
+    return (
+      <p className="mt-6 px-5 text-center text-[12px] text-gray">Memuat produk...</p>
+    );
+  }
 
   // Browse mode: no category filter picked, show every category
   // as its own horizontally scrollable row (same pattern as home).

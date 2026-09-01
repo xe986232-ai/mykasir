@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Banknote, CheckCircle2, ChevronLeft, Minus, Plus, QrCode, Trash2, Wallet, X } from "lucide-react";
 import { useCart } from "./CartContext";
 import AnimatedNumber from "./AnimatedNumber";
+import { supabase } from "@/lib/supabase";
 
 type Step = "cart" | "payment" | "success";
 type PaymentMethod = "cash" | "qris" | "card";
@@ -31,6 +32,8 @@ export default function CartSheet({
   const [step, setStep] = useState<Step>("cart");
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const [cashInput, setCashInput] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const cashReceived = parseFloat(cashInput.replace(",", ".")) || 0;
   const change = cashReceived - subtotal;
@@ -42,10 +45,52 @@ export default function CartSheet({
       setStep("cart");
       setMethod("cash");
       setCashInput("");
+      setSaveError(null);
     }, 250);
   }
 
-  function handleFinish() {
+  async function handleFinish() {
+    setSaving(true);
+    setSaveError(null);
+
+    // Simpan transaksi + item-nya ke Supabase (tabel transactions & transaction_items).
+    const { data: trx, error: trxError } = await supabase
+      .from("transactions")
+      .insert({
+        subtotal,
+        payment_method: method,
+        cash_received: method === "cash" ? cashReceived : null,
+        change_amount: method === "cash" ? Math.max(change, 0) : null,
+        currency,
+      })
+      .select()
+      .single();
+
+    if (trxError || !trx) {
+      setSaveError(trxError?.message ?? "Gagal menyimpan transaksi.");
+      setSaving(false);
+      return;
+    }
+
+    const { error: itemsError } = await supabase.from("transaction_items").insert(
+      items.map((item) => ({
+        transaction_id: trx.id,
+        product_id: item.id,
+        name: item.name,
+        unit: item.unit,
+        price: item.priceValue,
+        qty: item.qty,
+        subtotal: item.priceValue * item.qty,
+      }))
+    );
+
+    setSaving(false);
+
+    if (itemsError) {
+      setSaveError(itemsError.message);
+      return;
+    }
+
     clearCart();
     setStep("success");
   }
@@ -255,12 +300,18 @@ export default function CartSheet({
                   )}
                 </div>
 
+                {saveError && (
+                  <p className="mt-3 text-center text-[11.5px] font-medium text-badge">
+                    {saveError}
+                  </p>
+                )}
+
                 <button
-                  disabled={method === "cash" && cashReceived < subtotal}
+                  disabled={(method === "cash" && cashReceived < subtotal) || saving}
                   onClick={handleFinish}
                   className="mt-5 w-full rounded-2xl bg-primary py-3.5 text-[13.5px] font-bold text-white transition-transform active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
                 >
-                  Selesaikan Transaksi
+                  {saving ? "Menyimpan..." : "Selesaikan Transaksi"}
                 </button>
               </div>
             )}

@@ -3,7 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import KasirProductCard from "./KasirProductCard";
 import KasirCategoryRow from "./KasirCategoryRow";
-import { categories, products, getCategoryById, type CategoryId } from "@/lib/products";
+import type { CategoryId } from "@/lib/products";
+import { useProductsData } from "./ProductsDataContext";
 
 type KasirProductSectionProps = {
   selectedCategory: CategoryId | null;
@@ -16,7 +17,14 @@ export default function KasirProductSection({
   query,
   onSelectCategory,
 }: KasirProductSectionProps) {
+  const { categories, products, getCategoryById, loading } = useProductsData();
   const trimmedQuery = query.trim().toLowerCase();
+
+  if (loading && products.length === 0) {
+    return (
+      <p className="mt-6 px-5 text-center text-[12px] text-gray">Memuat produk...</p>
+    );
+  }
 
   // Lagi nyari (dengan atau tanpa kategori dipilih) -> tampil grid 2 kolom hasil filter.
   if (trimmedQuery || selectedCategory) {

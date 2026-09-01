@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { LayoutGrid } from "lucide-react";
-import { categories, type CategoryId } from "@/lib/products";
+import type { CategoryId } from "@/lib/products";
+import { useProductsData } from "./ProductsDataContext";
 
 type CategoriesProps = {
   selected: CategoryId | null;
@@ -11,6 +12,21 @@ type CategoriesProps = {
 };
 
 export default function Categories({ selected, onSelect }: CategoriesProps) {
+  const { categories, loading } = useProductsData();
+
+  if (loading && categories.length === 0) {
+    return (
+      <div className="mt-6 flex gap-3 px-5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-14 w-14 shrink-0 animate-pulse rounded-2xl bg-white/70"
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
