@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 
 const slides = [
@@ -52,7 +53,17 @@ export default function PromoBanner() {
         <div className="absolute inset-x-2 -bottom-2 top-2 rounded-[26px] bg-[#DCEBD9]" />
 
         {/* kartu banner utama */}
-        <div className="relative h-[168px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-[#F2F7EE] to-[#E4EFDC] shadow-[0_10px_24px_rgba(20,24,20,0.08)]">
+        <div className="relative h-[168px] w-full overflow-hidden rounded-3xl shadow-[0_10px_24px_rgba(20,24,20,0.08)]">
+          <Image
+            src="/promo/promo-banner.webp"
+            alt=""
+            fill
+            priority
+            sizes="430px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/5 to-transparent" />
+
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={slide.id}
@@ -64,25 +75,23 @@ export default function PromoBanner() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -24 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="absolute inset-0 flex cursor-grab items-center justify-between px-5 pt-4 pb-5 active:cursor-grabbing"
+              className="absolute inset-0 flex cursor-grab items-center px-5 pt-4 pb-5 active:cursor-grabbing"
             >
               <div className="z-10 flex h-full flex-col justify-between py-1">
                 <div>
-                  <p className="text-[13px] font-semibold text-ink">
+                  <p className="text-[13px] font-semibold text-white">
                     {slide.title}
                   </p>
-                  <p className="mt-1 text-[26px] font-extrabold leading-none text-primary-dark">
+                  <p className="mt-1 text-[26px] font-extrabold leading-none text-white">
                     {slide.discount}
                   </p>
-                  <p className="mt-1.5 text-[11px] text-gray">{slide.date}</p>
+                  <p className="mt-1.5 text-[11px] text-white/80">
+                    {slide.date}
+                  </p>
                 </div>
-                <button className="w-fit rounded-full bg-primary px-5 py-2 text-[12px] font-bold text-white shadow-[0_6px_14px_rgba(47,179,80,0.35)] active:scale-95 transition-transform">
+                <button className="w-fit rounded-full bg-white px-5 py-2 text-[12px] font-bold text-primary-dark shadow-[0_6px_14px_rgba(20,24,20,0.25)] active:scale-95 transition-transform">
                   {slide.cta}
                 </button>
-              </div>
-
-              <div className="pointer-events-none absolute right-[-8px] top-1/2 h-[150px] w-[150px] -translate-y-1/2">
-                <ProduceCluster />
               </div>
             </motion.div>
           </AnimatePresence>
@@ -110,23 +119,5 @@ export default function PromoBanner() {
         </div>
       </div>
     </motion.div>
-  );
-}
-
-function ProduceCluster() {
-  return (
-    <svg viewBox="0 0 160 160" className="h-full w-full">
-      <ellipse cx="80" cy="90" rx="8" ry="34" fill="#3E9142" transform="rotate(-18 80 90)" />
-      <path
-        d="M62 70c9 0 14 4 12 12l-8 34c-2 6-8 6-10 0l-7-30c-2-8 4-16 13-16z"
-        fill="#E8871C"
-        transform="rotate(-8 70 90)"
-      />
-      <circle cx="105" cy="95" r="22" fill="#8B1E24" />
-      <path d="M105 73c0-5 3-8 6-10-1 4-1 6-1 10h-5z" fill="#3E9142" />
-      <circle cx="45" cy="105" r="20" fill="#6E1F73" opacity="0.9" />
-      <circle cx="35" cy="90" r="10" fill="#7A2A80" opacity="0.9" />
-      <circle cx="55" cy="88" r="9" fill="#7A2A80" opacity="0.9" />
-    </svg>
   );
 }
