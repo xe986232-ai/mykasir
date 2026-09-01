@@ -24,8 +24,9 @@ function Frame({ children }: { children: ReactNode }) {
     <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#EFF1F0]">
       {/* Lingkaran dekoratif: HILANG total di awal (belum pernah ada yang
           klik "+"), baru muncul dengan animasi begitu burst() dipanggil.
-          Diposisikan condong ke kanan (bukan ke tengah), dan cuma kepotong
-          di sisi bawah (separo lingkaran yang mulus). */}
+          Dikunci pas di POJOK kanan-bawah — kepotong di 2 sisi sekaligus
+          (kanan & bawah) pakai offset -radius, jadi yang nongol cuma
+          seperempat lingkarannya di sudut, gak melebar ke tengah layar. */}
       <div
         key={burstSignal}
         style={
@@ -36,7 +37,7 @@ function Frame({ children }: { children: ReactNode }) {
               }
             : { opacity: 0, transform: "scale(0)" }
         }
-        className="pointer-events-none absolute -bottom-[190px] right-2.5 z-40 h-[380px] w-[380px] rounded-full bg-gradient-to-br from-primary to-primary-dark opacity-90"
+        className="pointer-events-none absolute -bottom-[220px] -right-[220px] z-40 h-[440px] w-[440px] rounded-full bg-gradient-to-br from-primary to-primary-dark opacity-90"
       />
 
       <Sidebar />
