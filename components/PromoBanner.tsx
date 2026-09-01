@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 
@@ -31,8 +31,113 @@ const slides = [
   },
 ];
 
+const AUTOPLAY_MS = 4500;
+const FALLBACK_COLOR = "#2FB350";
+
+// cache biar 1 gambar cuma dianalisa sekali per sesi, bukan tiap slide balik lagi
+const colorCache = new Map<string, string>();
+
+/**
+ * Ambil warna paling dominan dari sebuah gambar dengan menggambarnya
+ * ke canvas kecil lalu menghitung warna mana yang paling sering muncul.
+ * Hasilnya sedikit digelapkan biar tetap kebaca kalau dipakai di atas
+ * background putih (tombol "Get Now").
+ */
+function getDominantColor(src: string): Promise<string> {
+  const cached = colorCache.get(src);
+  if (cached) return Promise.resolve(cached);
+
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.src = src;
+    img.onload = () => {
+      try {
+        const size = 40;
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return resolve(FALLBACK_COLOR);
+
+        ctx.drawImage(img, 0, 0, size, size);
+        const { data } = ctx.getImageData(0, 0, size, size);
+
+        const buckets = new Map<
+          string,
+          { count: number; r: number; g: number; b: number }
+        >();
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const a = data[i + 3];
+          if (a < 200) continue;
+
+          // kuantisasi ringan biar warna yang mirip-mirip dianggap satu kelompok
+          const key = `${r >> 4}-${g >> 4}-${b >> 4}`;
+          const entry = buckets.get(key);
+          if (entry) {
+            entry.count++;
+          } else {
+            buckets.set(key, { count: 1, r, g, b });
+          }
+        }
+
+        let best = { count: 0, r: 0, g: 0, b: 0 };
+        buckets.forEach((entry) => {
+          if (entry.count > best.count) best = entry;
+        });
+
+        if (best.count === 0) return resolve(FALLBACK_COLOR);
+
+        // gelapkan sedikit biar teks tetap kontras di atas tombol putih
+        const darken = 0.82;
+        const r = Math.round(best.r * darken);
+        const g = Math.round(best.g * darken);
+        const b = Math.round(best.b * darken);
+        const hex = `#${[r, g, b]
+          .map((c) => c.toString(16).padStart(2, "0"))
+          .join("")}`;
+
+        colorCache.set(src, hex);
+        resolve(hex);
+      } catch {
+        resolve(FALLBACK_COLOR);
+      }
+    };
+    img.onerror = () => resolve(FALLBACK_COLOR);
+  });
+}
+
 export default function PromoBanner() {
   const [index, setIndex] = useState(0);
+  const [accentColor, setAccentColor] = useState(FALLBACK_COLOR);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const slide = slides[index];
+
+  // deteksi warna dominan tiap kali slide aktif berganti
+  useEffect(() => {
+    let cancelled = false;
+    getDominantColor(slide.image).then((color) => {
+      if (!cancelled) setAccentColor(color);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [slide.image]);
+
+  // ganti slide otomatis; timer di-reset tiap kali index berubah
+  // (baik lewat autoplay sendiri maupun swipe/klik dot manual)
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, AUTOPLAY_MS);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [index]);
 
   function handleDragEnd(_: unknown, info: PanInfo) {
     if (info.offset.x < -60) {
@@ -41,8 +146,6 @@ export default function PromoBanner() {
       setIndex((i) => (i - 1 + slides.length) % slides.length);
     }
   }
-
-  const slide = slides[index];
 
   return (
     <motion.div
@@ -92,7 +195,10 @@ export default function PromoBanner() {
                     {slide.date}
                   </p>
                 </div>
-                <button className="w-fit rounded-full bg-white px-5 py-2 text-[12px] font-bold text-primary-dark shadow-[0_6px_14px_rgba(20,24,20,0.25)] active:scale-95 transition-transform">
+                <button
+                  style={{ color: accentColor }}
+                  className="w-fit rounded-full bg-white px-5 py-2 text-[12px] font-bold shadow-[0_6px_14px_rgba(20,24,20,0.25)] transition-transform active:scale-95"
+                >
                   {slide.cta}
                 </button>
               </div>
