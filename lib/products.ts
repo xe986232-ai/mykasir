@@ -42,8 +42,8 @@ export type Category =
     };
 
 export const categories: Category[] = [
-  { id: "kunci-mas", label: "Kunci Mas", type: "image", image: "/categories/kunci-mas.png" },
-  { id: "mie-instan", label: "Mi Instan", type: "image", image: "/categories/mie-instan.png" },
+  { id: "kunci-mas", label: "Kunci Mas", type: "image", image: "/categories/kunci-mas.webp" },
+  { id: "mie-instan", label: "Mi Instan", type: "image", image: "/categories/mie-instan.webp" },
   { id: "fruits", label: "Fruits", type: "icon", bg: "#2FB350", Icon: FruitsIcon },
   { id: "vegetable", label: "Vegetable", type: "icon", bg: "#EF9526", Icon: VegetableIcon },
   { id: "drinks", label: "Drinks", type: "icon", bg: "#8B5CF6", Icon: DrinksIcon },
@@ -79,14 +79,14 @@ export const products: Product[] = [
   { id: 11, name: "Iced Tea", unit: "Per 500 ML", price: "2.50 AED", category: "drinks", Icon: IcedTeaIcon },
 
   // Kunci Mas
-  { id: 12, name: "Kunci Mas Cooking Oil", unit: "Per 1 L", price: "9.00 AED", category: "kunci-mas", image: "/categories/kunci-mas.png" },
-  { id: 13, name: "Kunci Mas Soy Sauce", unit: "Per 620 ML", price: "4.50 AED", category: "kunci-mas", image: "/categories/kunci-mas.png" },
-  { id: 14, name: "Kunci Mas Sweet Soy Sauce", unit: "Per 620 ML", price: "4.75 AED", delivery: true, category: "kunci-mas", image: "/categories/kunci-mas.png" },
+  { id: 12, name: "Kunci Mas Cooking Oil", unit: "Per 1 L", price: "9.00 AED", category: "kunci-mas", image: "/categories/kunci-mas.webp" },
+  { id: 13, name: "Kunci Mas Soy Sauce", unit: "Per 620 ML", price: "4.50 AED", category: "kunci-mas", image: "/categories/kunci-mas.webp" },
+  { id: 14, name: "Kunci Mas Sweet Soy Sauce", unit: "Per 620 ML", price: "4.75 AED", delivery: true, category: "kunci-mas", image: "/categories/kunci-mas.webp" },
 
   // Mi Instan
-  { id: 15, name: "Indomie Goreng", unit: "Per Pcs (85 GM)", price: "1.20 AED", category: "mie-instan", image: "/categories/mie-instan.png" },
-  { id: 16, name: "Mie Sedaap Soto", unit: "Per Pcs (76 GM)", price: "1.10 AED", category: "mie-instan", image: "/categories/mie-instan.png" },
-  { id: 17, name: "Indomie Rendang", unit: "Per Pcs (85 GM)", price: "1.30 AED", delivery: true, category: "mie-instan", image: "/categories/mie-instan.png" },
+  { id: 15, name: "Indomie Goreng", unit: "Per Pcs (85 GM)", price: "1.20 AED", category: "mie-instan", image: "/categories/mie-instan.webp" },
+  { id: 16, name: "Mie Sedaap Soto", unit: "Per Pcs (76 GM)", price: "1.10 AED", category: "mie-instan", image: "/categories/mie-instan.webp" },
+  { id: 17, name: "Indomie Rendang", unit: "Per Pcs (85 GM)", price: "1.30 AED", delivery: true, category: "mie-instan", image: "/categories/mie-instan.webp" },
 ];
 
 export function getCategoryById(id: CategoryId | string | null | undefined) {
