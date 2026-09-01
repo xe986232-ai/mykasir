@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus, Tag } from "lucide-react";
+import { Settings2 } from "lucide-react";
 import SearchHeader from "./SearchHeader";
 import FilterChips from "./FilterChips";
 import TopItemsGrid from "./TopItemsGrid";
@@ -49,23 +49,17 @@ export default function ProdukContent({ initialCategory }: ProdukContentProps) {
         className="flex items-center justify-between px-5 pb-2"
       >
         <div>
-          <h1 className="text-[16px] font-bold text-ink">Kelola Produk</h1>
-          <p className="text-[11.5px] text-gray">Tambah &amp; kelola produk tokomu</p>
+          <h1 className="text-[16px] font-bold text-ink">Daftar Produk</h1>
+          <p className="text-[11.5px] text-gray">Cek semua produk yang tersedia di tokomu</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/kategori/tambah"
-            aria-label="Tambah kategori"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
-          >
-            <Tag size={16} className="text-ink" />
-          </Link>
-          <Link
-            href="/produk/tambah"
+            href="/produk/kelola"
+            aria-label="Kelola produk"
             className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-[12.5px] font-bold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
           >
-            <Plus size={15} strokeWidth={2.6} />
-            Tambah
+            <Settings2 size={15} strokeWidth={2.6} />
+            Kelola
           </Link>
         </div>
       </motion.div>

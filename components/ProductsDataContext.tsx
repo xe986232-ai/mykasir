@@ -27,13 +27,13 @@ import { WaterBottleIcon, JuiceIcon, IcedTeaIcon } from "./icons/Drinks";
 // Pemetaan `icon_key` (disimpan di tabel Supabase) ke komponen icon React
 // yang sudah ada di project. Kalau nanti nambah kategori/produk baru lewat
 // Supabase, tinggal tambahin key di sini + gambar/icon-nya.
-const categoryIconMap: Record<string, () => React.ReactElement> = {
+export const categoryIconMap: Record<string, () => React.ReactElement> = {
   fruits: FruitsIcon,
   vegetable: VegetableIcon,
   drinks: DrinksIcon,
 };
 
-const productIconMap: Record<string, () => React.ReactElement> = {
+export const productIconMap: Record<string, () => React.ReactElement> = {
   papaya: PapayaIcon,
   strawberry: StrawberryIcon,
   carrot: CarrotIcon,

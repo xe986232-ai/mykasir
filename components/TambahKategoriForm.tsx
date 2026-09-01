@@ -187,10 +187,10 @@ export default function TambahKategoriForm() {
             Tambah Kategori Lain
           </button>
           <button
-            onClick={() => router.push("/produk")}
+            onClick={() => router.push("/produk/kelola")}
             className="w-full rounded-2xl bg-white py-3.5 text-[13.5px] font-bold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
           >
-            Lihat Daftar Produk
+            Kembali ke Kelola Produk
           </button>
         </div>
       </motion.div>
@@ -206,7 +206,7 @@ export default function TambahKategoriForm() {
         className="flex items-center gap-3 px-5"
       >
         <Link
-          href="/produk"
+          href="/produk/kelola"
           aria-label="Kembali"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
         >

@@ -1,19 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { ArrowLeft, Check, ImageOff, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowLeft,
+  Check,
+  ImageOff,
+  Loader2,
+  Trash2,
+} from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
 
-// Daftar icon_key bawaan yang beneran punya komponen icon di
-// ProductsDataContext (lihat productIconMap di sana). Kalau produk baru
-// ga punya gambar (image URL), user bisa pilih salah satu icon ini biar
-// tetep ada tampilan di kartu produk.
+// Sama seperti di TambahProdukForm — daftar icon_key bawaan yang punya
+// komponen icon di ProductsDataContext, dipakai kalau produk ga punya
+// gambar (image URL).
 const availableIconKeys = [
   { key: "papaya", label: "Pepaya" },
   { key: "strawberry", label: "Stroberi" },
@@ -28,8 +33,6 @@ const availableIconKeys = [
   { key: "icedtea", label: "Es Teh" },
 ];
 
-// Switch kecil ala iOS, dipakai buat field boolean (delivery & is_active)
-// biar konsisten sama gaya rounded-full si app.
 function ToggleField({
   label,
   description,
@@ -79,9 +82,30 @@ function FieldLabel({ children, required }: { children: string; required?: boole
 const inputClass =
   "w-full rounded-xl border border-black/[0.06] bg-gray-light/60 px-3.5 py-3 text-[13.5px] text-ink outline-none placeholder:text-gray focus:border-primary/50 focus:bg-white";
 
-export default function TambahProdukForm() {
+type EditProdukFormProps = {
+  productId: number;
+};
+
+type ProductRow = {
+  id: number;
+  name: string;
+  unit: string;
+  price: number | string;
+  currency: string;
+  delivery: boolean | null;
+  category_id: string;
+  icon_key: string | null;
+  image: string | null;
+  is_active: boolean | null;
+};
+
+export default function EditProdukForm({ productId }: EditProdukFormProps) {
   const router = useRouter();
   const { categories, refetch } = useProductsData();
+
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -97,19 +121,63 @@ export default function TambahProdukForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const priceValue = parseFloat(price.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
 
-  function resetForm() {
-    setName("");
-    setCategoryId("");
-    setUnit("");
-    setPrice("");
-    setDelivery(false);
-    setIsActive(true);
-    setImage("");
-    setIconKey("");
-    setImageError(false);
-  }
+  // Ambil data produk yang mau diedit dari Supabase, terus isi form-nya.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setLoadError(null);
+
+      if (!isSupabaseConfigured) {
+        setLoadError(
+          "Supabase belum dikonfigurasi. Set NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY di environment variables."
+        );
+        setLoading(false);
+        return;
+      }
+
+      const { data, error: fetchError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", productId)
+        .single();
+
+      if (cancelled) return;
+
+      if (fetchError || !data) {
+        if (fetchError?.code === "PGRST116") {
+          setNotFound(true);
+        } else {
+          setLoadError(fetchError?.message ?? "Gagal memuat data produk.");
+        }
+        setLoading(false);
+        return;
+      }
+
+      const p = data as ProductRow;
+      setName(p.name);
+      setCategoryId(p.category_id ?? "");
+      setUnit(p.unit);
+      setPrice(String(Number(p.price) || ""));
+      setDelivery(p.delivery ?? false);
+      setIsActive(p.is_active ?? true);
+      setImage(p.image ?? "");
+      setIconKey(p.icon_key ?? "");
+      setLoading(false);
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [productId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -128,26 +196,81 @@ export default function TambahProdukForm() {
     }
 
     setSaving(true);
-    const { error: insertError } = await supabase.from("products").insert({
-      name: name.trim(),
-      unit: unit.trim(),
-      price: priceValue,
-      currency: "Rp",
-      delivery,
-      category_id: categoryId,
-      icon_key: image.trim() ? null : iconKey || null,
-      image: image.trim() || null,
-      is_active: isActive,
-    });
+    const { error: updateError } = await supabase
+      .from("products")
+      .update({
+        name: name.trim(),
+        unit: unit.trim(),
+        price: priceValue,
+        currency: "Rp",
+        delivery,
+        category_id: categoryId,
+        icon_key: image.trim() ? null : iconKey || null,
+        image: image.trim() || null,
+        is_active: isActive,
+      })
+      .eq("id", productId);
     setSaving(false);
 
-    if (insertError) {
-      setError(insertError.message || "Gagal menyimpan produk ke Supabase.");
+    if (updateError) {
+      setError(updateError.message || "Gagal menyimpan perubahan produk.");
       return;
     }
 
     refetch();
     setSuccess(true);
+  }
+
+  async function handleConfirmDelete() {
+    setDeleting(true);
+    setDeleteError(null);
+
+    const { error: deleteErr } = await supabase.from("products").delete().eq("id", productId);
+    setDeleting(false);
+
+    if (deleteErr) {
+      setDeleteError(deleteErr.message || "Gagal menghapus produk.");
+      return;
+    }
+
+    refetch();
+    router.push("/produk/kelola");
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 pt-24 text-center">
+        <Loader2 size={24} className="animate-spin text-primary" />
+        <p className="mt-3 text-[12.5px] text-gray">Memuat data produk...</p>
+      </div>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 pt-24 text-center">
+        <p className="text-[14px] font-bold text-ink">Produk tidak ditemukan</p>
+        <p className="mt-1.5 text-[12.5px] text-gray">
+          Produk ini mungkin sudah dihapus sebelumnya.
+        </p>
+        <Link
+          href="/produk/kelola"
+          className="mt-6 rounded-2xl bg-primary px-6 py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-transform"
+        >
+          Kembali ke Kelola Produk
+        </Link>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="px-5 pt-8">
+        <p className="rounded-xl bg-badge/10 px-3.5 py-3 text-[12px] font-medium text-badge">
+          {loadError}
+        </p>
+      </div>
+    );
   }
 
   if (success) {
@@ -160,26 +283,23 @@ export default function TambahProdukForm() {
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-light">
           <Check size={30} className="text-primary" strokeWidth={2.5} />
         </div>
-        <h1 className="mt-5 text-[17px] font-bold text-ink">Produk tersimpan!</h1>
+        <h1 className="mt-5 text-[17px] font-bold text-ink">Produk diperbarui!</h1>
         <p className="mt-1.5 text-[13px] text-gray">
-          &ldquo;{name}&rdquo; berhasil ditambahkan dan siap dikelola.
+          Perubahan pada &ldquo;{name}&rdquo; berhasil disimpan.
         </p>
 
         <div className="mt-7 flex w-full flex-col gap-2.5">
           <button
-            onClick={() => {
-              resetForm();
-              setSuccess(false);
-            }}
+            onClick={() => router.push("/produk/kelola")}
             className="w-full rounded-2xl bg-primary py-3.5 text-[13.5px] font-bold text-white active:scale-[0.98] transition-transform"
           >
-            Tambah Produk Lain
+            Kembali ke Kelola Produk
           </button>
           <button
-            onClick={() => router.push("/produk/kelola")}
+            onClick={() => setSuccess(false)}
             className="w-full rounded-2xl bg-white py-3.5 text-[13.5px] font-bold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
           >
-            Kembali ke Kelola Produk
+            Lanjut Edit Produk Ini
           </button>
         </div>
       </motion.div>
@@ -202,8 +322,8 @@ export default function TambahProdukForm() {
           <ArrowLeft size={18} className="text-ink" />
         </Link>
         <div>
-          <h1 className="text-[15px] font-bold text-ink">Tambah Produk</h1>
-          <p className="text-[11.5px] text-gray">Isi data produk baru untuk dikelola tokomu</p>
+          <h1 className="text-[15px] font-bold text-ink">Edit Produk</h1>
+          <p className="text-[11.5px] text-gray">Perbarui data &ldquo;{name}&rdquo;</p>
         </div>
       </motion.div>
 
@@ -353,7 +473,7 @@ export default function TambahProdukForm() {
           <h2 className="mb-3 text-[13px] font-bold text-ink">Status</h2>
           <ToggleField
             label="Aktifkan Produk"
-            description="Kalau nonaktif, produk ga muncul di kasir & daftar produk"
+            description="Kalau nonaktif, produk ga muncul di kasir & katalog produk"
             checked={isActive}
             onChange={setIsActive}
           />
@@ -376,10 +496,88 @@ export default function TambahProdukForm() {
               Menyimpan...
             </>
           ) : (
-            "Simpan Produk"
+            "Simpan Perubahan"
           )}
         </button>
+
+        {/* Zona berbahaya: hapus produk */}
+        <section className="mt-2 rounded-2xl border border-dashed border-badge/30 bg-badge/5 p-4">
+          <h2 className="mb-1 text-[13px] font-bold text-badge">Zona Berbahaya</h2>
+          <p className="mb-3 text-[11px] text-gray">
+            Produk yang dihapus tidak bisa dikembalikan lagi.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-[13px] font-bold text-badge shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
+          >
+            <Trash2 size={15} />
+            Hapus Produk Ini
+          </button>
+        </section>
       </motion.form>
+
+      {/* Modal konfirmasi hapus */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !deleting && setShowDeleteConfirm(false)}
+              className="absolute inset-0 z-50 bg-black/40"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              transition={{ type: "spring", damping: 26, stiffness: 320 }}
+              className="absolute inset-x-6 top-1/2 z-50 -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl"
+            >
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-badge/10">
+                <Trash2 size={20} className="text-badge" />
+              </div>
+              <h2 className="mt-3 text-center text-[14.5px] font-bold text-ink">
+                Hapus produk ini?
+              </h2>
+              <p className="mt-1 text-center text-[12px] text-gray">
+                &ldquo;{name}&rdquo; akan dihapus permanen dan tidak bisa dikembalikan.
+              </p>
+
+              {deleteError && (
+                <p className="mt-3 rounded-xl bg-badge/10 px-3 py-2 text-center text-[11.5px] font-medium text-badge">
+                  {deleteError}
+                </p>
+              )}
+
+              <div className="mt-5 flex gap-2.5">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleting}
+                  className="flex-1 rounded-2xl bg-gray-light py-3 text-[13px] font-bold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleConfirmDelete}
+                  disabled={deleting}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-badge py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-60"
+                >
+                  {deleting ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Menghapus...
+                    </>
+                  ) : (
+                    "Ya, Hapus"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

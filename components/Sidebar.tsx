@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingCart, Package, Tag, FileText } from "lucide-react";
+import { ShoppingCart, Package, ListChecks, Tag, FileText } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
 
 // Icon dashboard di kode HTML aslinya pakai 4 lingkaran (bukan 4 kotak
@@ -41,9 +41,11 @@ function DashboardIcon({
 export const SIDEBAR_WIDTH = 232;
 export const SIDEBAR_GAP = 14;
 
-// Struktur & isi menu ini di-copy persis dari sidebar kode HTML kasir:
-// - Section "Menu": Dashboard, Kasir
-// - Section "Master Data": Kelola Produk, Kelola Kategori
+// Struktur & isi menu:
+// - Section "Menu": Dashboard, Kasir, Daftar Produk (browse/katalog produk,
+//   BUKAN halaman kelola — cuma buat liat-liat produk yang tersedia)
+// - Section "Master Data": Kelola Produk (add/edit/hapus produk), Kelola
+//   Kategori
 // - Section "Laporan": Riwayat Transaksi
 // href "#" dipakai untuk menu yang belum punya halaman di app Next.js ini.
 // "Kelola Kategori" langsung diarahkan ke halaman Tambah Kategori karena
@@ -54,12 +56,13 @@ const navSections = [
     items: [
       { label: "Dashboard", href: "/", Icon: DashboardIcon },
       { label: "Kasir", href: "/kasir", Icon: ShoppingCart },
+      { label: "Daftar Produk", href: "/produk", Icon: Package },
     ],
   },
   {
     label: "Master Data",
     items: [
-      { label: "Kelola Produk", href: "/produk", Icon: Package },
+      { label: "Kelola Produk", href: "/produk/kelola", Icon: ListChecks },
       { label: "Kelola Kategori", href: "/kategori/tambah", Icon: Tag },
     ],
   },
@@ -72,6 +75,15 @@ const navSections = [
 export default function Sidebar() {
   const { close } = useSidebar();
   const pathname = usePathname();
+
+  // Kalau beberapa href match (misal "/produk" & "/produk/kelola" pas lagi
+  // di "/produk/kelola/tambah"), yang menang cuma href paling spesifik
+  // (paling panjang) — biar ga dua menu ke-highlight bareng.
+  const allHrefs = navSections.flatMap((s) => s.items.map((i) => i.href)).filter((h) => h !== "#");
+  const matchingHrefs = allHrefs.filter(
+    (href) => pathname === href || (href !== "/" && pathname.startsWith(`${href}/`))
+  );
+  const activeHref = matchingHrefs.sort((a, b) => b.length - a.length)[0];
 
   return (
     <aside
@@ -111,7 +123,7 @@ export default function Sidebar() {
               {section.label}
             </div>
             {section.items.map(({ label, href, Icon }) => {
-              const isActive = href !== "#" && pathname === href;
+              const isActive = href !== "#" && href === activeHref;
               const content = (
                 <>
                   {isActive && (
