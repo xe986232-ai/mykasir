@@ -63,7 +63,7 @@ const navSections = [
   },
   {
     label: "Laporan",
-    items: [{ label: "Riwayat Transaksi", href: "#", Icon: FileText }],
+    items: [{ label: "Riwayat Transaksi", href: "/transaksi", Icon: FileText }],
   },
 ];
 
