@@ -35,7 +35,7 @@ export default function SplashScreen() {
             style={{
               fontFamily: "'Pacifico', cursive",
               color: "#ea4c89",
-              transform: "rotate(-4deg)",
+              transform: "rotate(-2deg)",
             }}
             className="text-6xl"
           >
