@@ -8,11 +8,13 @@ import { categories, products, getCategoryById, type CategoryId } from "@/lib/pr
 type KasirProductSectionProps = {
   selectedCategory: CategoryId | null;
   query: string;
+  onSelectCategory?: (id: CategoryId) => void;
 };
 
 export default function KasirProductSection({
   selectedCategory,
   query,
+  onSelectCategory,
 }: KasirProductSectionProps) {
   const trimmedQuery = query.trim().toLowerCase();
 
@@ -78,6 +80,7 @@ export default function KasirProductSection({
           category={category}
           products={products.filter((p) => p.category === category.id)}
           delay={0.15 + i * 0.05}
+          onViewAll={() => onSelectCategory?.(category.id)}
         />
       ))}
     </div>

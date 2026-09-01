@@ -46,7 +46,11 @@ export default function KasirContent() {
           ke produk, ga perlu promo carousel kayak di halaman utama. */}
 
       <Categories selected={selectedCategory} onSelect={setSelectedCategory} />
-      <KasirProductSection selectedCategory={selectedCategory} query={query} />
+      <KasirProductSection
+        selectedCategory={selectedCategory}
+        query={query}
+        onSelectCategory={setSelectedCategory}
+      />
     </>
   );
 }
