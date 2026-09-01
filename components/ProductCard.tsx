@@ -1,17 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Plus, Truck } from "lucide-react";
-
-export type Product = {
-  id: number;
-  name: string;
-  unit: string;
-  price: string;
-  delivery?: boolean;
-  Icon: () => React.ReactElement;
-};
+import type { Product } from "@/lib/products";
 
 export default function ProductCard({
   name,
@@ -19,7 +12,8 @@ export default function ProductCard({
   price,
   delivery,
   Icon,
-}: Omit<Product, "id">) {
+  image,
+}: Omit<Product, "id" | "category">) {
   const [added, setAdded] = useState(false);
 
   return (
@@ -32,9 +26,21 @@ export default function ProductCard({
       )}
 
       <div className="flex h-[92px] items-center justify-center">
-        <div className="h-[76px] w-[76px]">
-          <Icon />
-        </div>
+        {image ? (
+          <div className="h-[76px] w-[76px] overflow-hidden rounded-xl">
+            <Image
+              src={image}
+              alt={name}
+              width={76}
+              height={76}
+              className="h-full w-full object-contain"
+            />
+          </div>
+        ) : Icon ? (
+          <div className="h-[76px] w-[76px]">
+            <Icon />
+          </div>
+        ) : null}
       </div>
 
       <p className="mt-1 text-[13.5px] font-extrabold text-ink">

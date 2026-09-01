@@ -2,45 +2,58 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ProductCard, { type Product } from "./ProductCard";
-import {
-  CarrotIcon,
-  PomegranateIcon,
-  OnionIcon,
-  RaspberryIcon,
-  TomatoIcon,
-  BroccoliIcon,
-  PapayaIcon,
-  StrawberryIcon,
-} from "./icons/Produce";
-
-const items: Product[] = [
-  { id: 1, name: "Carrot Vegetable", unit: "Per 1 KG (Pcs)", price: "2.25 AED", Icon: CarrotIcon },
-  { id: 2, name: "Pomegranate Fruit", unit: "Per 1 KG (Pcs)", price: "9.00 AED", Icon: PomegranateIcon },
-  { id: 3, name: "Onion Vegetable", unit: "Per 1 KG (Pcs)", price: "3.50 AED", Icon: OnionIcon },
-  { id: 4, name: "Raspberries Fruit", unit: "Per 500 GM", price: "12.00 AED", Icon: RaspberryIcon },
-  { id: 5, name: "Tomato Vegetable", unit: "Per 1 KG (Pcs)", price: "5.00 AED", Icon: TomatoIcon },
-  { id: 6, name: "Broccoli Vegetable", unit: "Per 1 KG (Pcs)", price: "2.00 AED", Icon: BroccoliIcon },
-  { id: 7, name: "Papaya Fruit", unit: "Per 1 KG (Pcs)", price: "6.50 AED", delivery: true, Icon: PapayaIcon },
-  { id: 8, name: "Strawberry Fruit", unit: "Per 500 GM", price: "9.00 AED", delivery: true, Icon: StrawberryIcon },
-];
+import ProductCard from "./ProductCard";
+import CategoryRow from "./CategoryRow";
+import { categories, products, type CategoryId } from "@/lib/products";
 
 const INITIAL_COUNT = 6;
 
-export default function TopItemsGrid() {
+type TopItemsGridProps = {
+  activeCategoryIds: CategoryId[];
+  deliveryOnly: boolean;
+};
+
+export default function TopItemsGrid({ activeCategoryIds, deliveryOnly }: TopItemsGridProps) {
   const [expanded, setExpanded] = useState(false);
-  const visible = expanded ? items : items.slice(0, INITIAL_COUNT);
+
+  const base = deliveryOnly ? products.filter((p) => p.delivery) : products;
+
+  // Browse mode: no category filter picked, show every category
+  // as its own horizontally scrollable row (same pattern as home).
+  if (activeCategoryIds.length === 0) {
+    return (
+      <div className="mt-6 flex flex-col gap-6 pb-6">
+        {categories.map((category, i) => (
+          <CategoryRow
+            key={category.id}
+            category={category}
+            products={base.filter((p) => p.category === category.id)}
+            delay={0.1 + i * 0.05}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // Filtered mode: one or more category chips active, show a single grid.
+  const filtered = base.filter((p) => activeCategoryIds.includes(p.category));
+  const visible = expanded ? filtered : filtered.slice(0, INITIAL_COUNT);
+  const title =
+    activeCategoryIds.length === 1
+      ? categories.find((c) => c.id === activeCategoryIds[0])?.label ?? "Produk"
+      : "Hasil Filter";
 
   return (
     <motion.div
+      key={activeCategoryIds.join(",")}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: 0.15, ease: "easeOut" }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
       className="mt-6 px-5 pb-6"
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-[15px] font-bold text-ink">Top Items 2025</h2>
-        {items.length > INITIAL_COUNT && (
+        <h2 className="text-[15px] font-bold text-ink">{title}</h2>
+        {filtered.length > INITIAL_COUNT && (
           <button
             onClick={() => setExpanded((v) => !v)}
             className="text-[12px] font-semibold text-primary active:opacity-60"
@@ -65,6 +78,12 @@ export default function TopItemsGrid() {
           ))}
         </AnimatePresence>
       </div>
+
+      {filtered.length === 0 && (
+        <p className="py-8 text-center text-[12px] text-gray">
+          Produk tidak ditemukan.
+        </p>
+      )}
     </motion.div>
   );
 }

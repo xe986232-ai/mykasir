@@ -1,26 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpDown, SlidersHorizontal } from "lucide-react";
+import { categories } from "@/lib/products";
 
-const filters = [
+type FilterItem = {
+  id: string;
+  label: string;
+  icon?: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+};
+
+const staticFilters: FilterItem[] = [
   { id: "sort", label: "Sort by", icon: ArrowUpDown },
   { id: "delivery", label: "Free Delivery" },
   { id: "stores", label: "Stores" },
-  { id: "fruits", label: "Fruits" },
-  { id: "veg", label: "Vegetable" },
 ];
 
-export default function FilterChips() {
-  const [active, setActive] = useState<string[]>([]);
+const filters: FilterItem[] = [
+  ...staticFilters,
+  ...categories.map((c) => ({ id: c.id, label: c.label })),
+];
 
-  function toggle(id: string) {
-    setActive((prev) =>
-      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
-    );
-  }
+type FilterChipsProps = {
+  active: string[];
+  onToggle: (id: string) => void;
+};
 
+export default function FilterChips({ active, onToggle }: FilterChipsProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -6 }}
@@ -40,7 +46,8 @@ export default function FilterChips() {
           return (
             <button
               key={id}
-              onClick={() => toggle(id)}
+              onClick={() => onToggle(id)}
+              aria-pressed={isActive}
               className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-semibold transition-colors ${
                 isActive
                   ? "bg-primary text-white"

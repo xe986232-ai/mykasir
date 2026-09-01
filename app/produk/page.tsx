@@ -1,17 +1,17 @@
-import SearchHeader from "@/components/SearchHeader";
-import FilterChips from "@/components/FilterChips";
-import StoreRow from "@/components/StoreRow";
-import TopItemsGrid from "@/components/TopItemsGrid";
+import ProdukContent from "@/components/ProdukContent";
 
-export default function ProdukPage() {
+type ProdukPageProps = {
+  searchParams: Promise<{ category?: string }>;
+};
+
+export default async function ProdukPage({ searchParams }: ProdukPageProps) {
+  const params = await searchParams;
+
   return (
     <div className="flex min-h-screen justify-center bg-[#EFF1F0]">
       <div className="flex w-full max-w-[430px] flex-col bg-[#EFF1F0]">
         <main className="flex-1 pb-4 pt-4">
-          <SearchHeader />
-          <FilterChips />
-          <StoreRow />
-          <TopItemsGrid />
+          <ProdukContent initialCategory={params.category ?? null} />
         </main>
       </div>
     </div>
