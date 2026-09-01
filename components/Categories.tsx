@@ -29,7 +29,7 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
       transition={{ duration: 0.45, delay: 0.15, ease: "easeOut" }}
       className="mt-6"
     >
-      <div className="flex items-start gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex items-start gap-3 overflow-x-auto px-5 pt-2 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {categories.map((cat) => {
           const isActive = selected === cat.id;
           return (
