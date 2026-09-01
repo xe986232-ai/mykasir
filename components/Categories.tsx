@@ -54,6 +54,7 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
                     width={56}
                     height={56}
                     className="h-14 w-14 rounded-2xl object-contain"
+                    unoptimized
                   />
                 ) : (
                   <div

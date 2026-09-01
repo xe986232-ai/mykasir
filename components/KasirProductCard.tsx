@@ -32,6 +32,7 @@ export default function KasirProductCard(product: Omit<Product, "category">) {
               width={76}
               height={76}
               className="h-full w-full object-contain"
+              unoptimized
             />
           </div>
         ) : Icon ? (

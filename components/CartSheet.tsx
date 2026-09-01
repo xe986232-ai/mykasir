@@ -170,6 +170,7 @@ export default function CartSheet({
                                 width={48}
                                 height={48}
                                 className="h-full w-full object-contain"
+                                unoptimized
                               />
                             ) : item.Icon ? (
                               <div className="h-9 w-9">

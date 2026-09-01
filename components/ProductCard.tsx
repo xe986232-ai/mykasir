@@ -34,6 +34,7 @@ export default function ProductCard({
               width={76}
               height={76}
               className="h-full w-full object-contain"
+              unoptimized
             />
           </div>
         ) : Icon ? (
