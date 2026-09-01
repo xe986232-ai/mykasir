@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useBulkActions } from "./BulkActionsContext";
+import { MorphingInfinity } from "./MorphingInfinity";
 
 export default function BulkActionsBar() {
   const { bulkActions, confirmOpen, requestConfirm, closeConfirm } = useBulkActions();
@@ -95,7 +96,7 @@ export default function BulkActionsBar() {
                 >
                   {deleting ? (
                     <>
-                      <Loader2 size={14} className="animate-spin" />
+                      <MorphingInfinity className="h-3.5 w-3.5" />
                       Menghapus...
                     </>
                   ) : (

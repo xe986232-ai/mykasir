@@ -5,6 +5,7 @@ import KasirProductCard from "./KasirProductCard";
 import KasirCategoryRow from "./KasirCategoryRow";
 import type { CategoryId } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
+import LoadingScreen from "./LoadingScreen";
 
 type KasirProductSectionProps = {
   selectedCategory: CategoryId | null;
@@ -21,9 +22,7 @@ export default function KasirProductSection({
   const trimmedQuery = query.trim().toLowerCase();
 
   if (loading && products.length === 0) {
-    return (
-      <p className="mt-6 px-5 text-center text-[12px] text-gray">Memuat produk...</p>
-    );
+    return <LoadingScreen label="Memuat produk..." />;
   }
 
   // Lagi nyari (dengan atau tanpa kategori dipilih) -> tampil grid 2 kolom hasil filter.

@@ -9,12 +9,13 @@ import {
   ArrowLeft,
   Check,
   ImageOff,
-  Loader2,
   Trash2,
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
+import { MorphingInfinity } from "./MorphingInfinity";
+import LoadingScreen from "./LoadingScreen";
 
 // Sama seperti di TambahProdukForm — daftar icon_key bawaan yang punya
 // komponen icon di ProductsDataContext, dipakai kalau produk ga punya
@@ -238,12 +239,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
   }
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center px-6 pt-24 text-center">
-        <Loader2 size={24} className="animate-spin text-primary" />
-        <p className="mt-3 text-[12.5px] text-gray">Memuat data produk...</p>
-      </div>
-    );
+    return <LoadingScreen label="Memuat data produk..." />;
   }
 
   if (notFound) {
@@ -492,7 +488,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
         >
           {saving ? (
             <>
-              <Loader2 size={16} className="animate-spin" />
+              <MorphingInfinity className="h-4 w-4" />
               Menyimpan...
             </>
           ) : (
@@ -566,7 +562,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
                 >
                   {deleting ? (
                     <>
-                      <Loader2 size={14} className="animate-spin" />
+                      <MorphingInfinity className="h-3.5 w-3.5" />
                       Menghapus...
                     </>
                   ) : (

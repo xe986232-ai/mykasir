@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
   Circle,
-  Loader2,
   Package,
   Pencil,
   Plus,
@@ -20,6 +19,8 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData, productIconMap } from "./ProductsDataContext";
 import { useBulkActions } from "./BulkActionsContext";
+import { MorphingInfinity } from "./MorphingInfinity";
+import LoadingScreen from "./LoadingScreen";
 
 const LONG_PRESS_MS = 480;
 
@@ -302,7 +303,7 @@ export default function KelolaProdukContent() {
       {/* List */}
       <div className="mt-4 flex flex-col gap-2.5 px-5 pb-6">
         {loading && rows.length === 0 && (
-          <p className="py-8 text-center text-[12px] text-gray">Memuat produk...</p>
+          <LoadingScreen label="Memuat produk..." className="py-8" />
         )}
 
         {error && (
@@ -472,7 +473,7 @@ export default function KelolaProdukContent() {
                 >
                   {deleting ? (
                     <>
-                      <Loader2 size={14} className="animate-spin" />
+                      <MorphingInfinity className="h-3.5 w-3.5" />
                       Menghapus...
                     </>
                   ) : (

@@ -5,9 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, ImageOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, ImageOff } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useProductsData } from "./ProductsDataContext";
+import { MorphingInfinity } from "./MorphingInfinity";
 
 // Icon bawaan yang beneran punya komponen React di ProductsDataContext
 // (lihat categoryIconMap di sana). Kalau nanti nambah icon baru, tambahin
@@ -391,7 +392,7 @@ export default function TambahKategoriForm() {
         >
           {saving ? (
             <>
-              <Loader2 size={16} className="animate-spin" />
+              <MorphingInfinity className="h-4 w-4" />
               Menyimpan...
             </>
           ) : (

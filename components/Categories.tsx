@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { LayoutGrid } from "lucide-react";
 import type { CategoryId } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
+import { MorphingInfinity } from "./MorphingInfinity";
 
 type CategoriesProps = {
   selected: CategoryId | null;
@@ -16,14 +17,8 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
 
   if (loading && categories.length === 0) {
     return (
-      <div className="mt-6 flex gap-3 px-5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            style={{ width: "calc((100% - 48px) / 5)" }}
-            className="h-14 shrink-0 animate-pulse rounded-2xl bg-white/70"
-          />
-        ))}
+      <div className="mt-6 flex h-14 items-center justify-center px-5">
+        <MorphingInfinity className="h-8 w-8 text-primary" />
       </div>
     );
   }

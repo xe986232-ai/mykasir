@@ -5,10 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, ImageOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, ImageOff } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
+import { MorphingInfinity } from "./MorphingInfinity";
 
 // Daftar icon_key bawaan yang beneran punya komponen icon di
 // ProductsDataContext (lihat productIconMap di sana). Kalau produk baru
@@ -372,7 +373,7 @@ export default function TambahProdukForm() {
         >
           {saving ? (
             <>
-              <Loader2 size={16} className="animate-spin" />
+              <MorphingInfinity className="h-4 w-4" />
               Menyimpan...
             </>
           ) : (

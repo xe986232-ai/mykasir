@@ -6,6 +6,7 @@ import ProductCard from "./ProductCard";
 import CategoryRow from "./CategoryRow";
 import type { CategoryId } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
+import LoadingScreen from "./LoadingScreen";
 
 const INITIAL_COUNT = 6;
 
@@ -21,9 +22,7 @@ export default function TopItemsGrid({ activeCategoryIds, deliveryOnly }: TopIte
   const base = deliveryOnly ? products.filter((p) => p.delivery) : products;
 
   if (loading && products.length === 0) {
-    return (
-      <p className="mt-6 px-5 text-center text-[12px] text-gray">Memuat produk...</p>
-    );
+    return <LoadingScreen label="Memuat produk..." />;
   }
 
   // Browse mode: no category filter picked, show every category

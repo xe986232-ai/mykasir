@@ -18,6 +18,8 @@ import { useSidebar } from "./SidebarContext";
 import AnimatedNumber from "./AnimatedNumber";
 import { formatRupiah } from "@/lib/products";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import LoadingScreen from "./LoadingScreen";
+import { MorphingInfinity } from "./MorphingInfinity";
 import { useBulkActions } from "./BulkActionsContext";
 
 type TransactionItemRow = {
@@ -130,7 +132,11 @@ function TransaksiHeader({
         aria-label="Muat ulang"
         className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
       >
-        <RefreshCw size={16} className={`text-ink ${loading ? "animate-spin" : ""}`} />
+        {loading ? (
+          <MorphingInfinity className="h-4 w-4 text-ink" />
+        ) : (
+          <RefreshCw size={16} className="text-ink" />
+        )}
       </button>
     </motion.header>
   );
@@ -459,7 +465,7 @@ export default function TransaksiContent() {
 
       <div className={`mt-4 flex flex-col gap-2.5 px-5 ${selectMode ? "pb-24" : "pb-6"}`}>
         {loading && transactions.length === 0 && (
-          <p className="py-10 text-center text-[12.5px] text-gray">Memuat transaksi...</p>
+          <LoadingScreen label="Memuat transaksi..." className="py-10" />
         )}
 
         {error && (
