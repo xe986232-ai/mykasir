@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Store, Search, Activity, User } from "lucide-react";
+import { LayoutGrid, ShoppingCart, Package, Tag, FileText } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
 
 // Sama seperti --sidebar-w & gap di kode HTML aslinya, cuma diskalakan
@@ -10,12 +10,30 @@ import { useSidebar } from "./SidebarContext";
 export const SIDEBAR_WIDTH = 232;
 export const SIDEBAR_GAP = 14;
 
-const navItems = [
-  { label: "Home", href: "/", Icon: Home },
-  { label: "Produk", href: "/produk", Icon: Store },
-  { label: "Search", href: "/produk", Icon: Search },
-  { label: "Activity", href: "#", Icon: Activity },
-  { label: "Profile", href: "#", Icon: User },
+// Struktur & isi menu ini di-copy persis dari sidebar kode HTML kasir:
+// - Section "Menu": Dashboard, Kasir
+// - Section "Master Data": Kelola Produk, Kelola Kategori
+// - Section "Laporan": Riwayat Transaksi
+// href "#" dipakai untuk menu yang belum punya halaman di app Next.js ini.
+const navSections = [
+  {
+    label: "Menu",
+    items: [
+      { label: "Dashboard", href: "/", Icon: LayoutGrid },
+      { label: "Kasir", href: "#", Icon: ShoppingCart },
+    ],
+  },
+  {
+    label: "Master Data",
+    items: [
+      { label: "Kelola Produk", href: "/produk", Icon: Package },
+      { label: "Kelola Kategori", href: "#", Icon: Tag },
+    ],
+  },
+  {
+    label: "Laporan",
+    items: [{ label: "Riwayat Transaksi", href: "#", Icon: FileText }],
+  },
 ];
 
 export default function Sidebar() {
@@ -45,40 +63,62 @@ export default function Sidebar() {
           </svg>
         </div>
         <div>
-          <div className="text-[13px] font-bold text-white">FreshCart</div>
-          <div className="text-[11px] text-white/65">Grocery App</div>
+          <div className="text-[13px] font-bold text-white">Toko</div>
+          <div className="text-[11px] text-white/65">Sistem Kasir</div>
         </div>
       </div>
 
       <nav className="flex-1 py-2">
-        <div className="px-5 pb-1.5 pt-4 text-[11.5px] font-medium text-white/65">
-          Menu
-        </div>
-        {navItems.map(({ label, href, Icon }) => {
-          const isActive = href !== "#" && pathname === href;
-          return (
-            <Link
-              key={label}
-              href={href}
-              onClick={close}
-              className={`relative mx-3 my-1 flex items-center gap-3 rounded-xl px-4 py-3 text-[13.5px] font-semibold transition-colors ${
+        {navSections.map((section, sectionIdx) => (
+          <div key={section.label}>
+            {sectionIdx > 0 && (
+              <div className="mx-6 my-3.5 h-px bg-white/20" />
+            )}
+            <div className="px-5 pb-1.5 pt-3.5 text-[12px] font-medium text-white/65">
+              {section.label}
+            </div>
+            {section.items.map(({ label, href, Icon }) => {
+              const isActive = href !== "#" && pathname === href;
+              const content = (
+                <>
+                  {isActive && (
+                    <span className="absolute left-1 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-white" />
+                  )}
+                  <Icon
+                    size={18}
+                    strokeWidth={isActive ? 2.2 : 1.8}
+                    className={isActive ? "opacity-100" : "opacity-85"}
+                  />
+                  {label}
+                </>
+              );
+              const className = `relative mx-3 my-1 flex w-[calc(100%-24px)] items-center gap-3 rounded-xl px-4 py-3 text-left text-[14px] font-semibold transition-colors ${
                 isActive
                   ? "bg-white/20 text-white"
                   : "text-white/85 hover:bg-white/10"
-              }`}
-            >
-              {isActive && (
-                <span className="absolute left-1 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-white" />
-              )}
-              <Icon
-                size={18}
-                strokeWidth={isActive ? 2.2 : 1.8}
-                className={isActive ? "opacity-100" : "opacity-80"}
-              />
-              {label}
-            </Link>
-          );
-        })}
+              }`;
+
+              if (href === "#") {
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={close}
+                    className={className}
+                  >
+                    {content}
+                  </button>
+                );
+              }
+
+              return (
+                <Link key={label} href={href} onClick={close} className={className}>
+                  {content}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
     </aside>
   );
