@@ -13,7 +13,7 @@ import {
 import { useSidebar } from "./SidebarContext";
 import AnimatedNumber from "./AnimatedNumber";
 import { formatRupiah } from "@/lib/products";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 type TransactionItemRow = {
   id: number;
@@ -208,6 +208,14 @@ export default function TransaksiContent() {
   async function load() {
     setLoading(true);
     setError(null);
+
+    if (!isSupabaseConfigured) {
+      setError(
+        "Supabase belum dikonfigurasi. Set NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY di environment variables."
+      );
+      setLoading(false);
+      return;
+    }
 
     const { data, error: fetchError } = await supabase
       .from("transactions")

@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah, type Category, type CategoryId, type Product } from "@/lib/products";
 import { FruitsIcon, VegetableIcon, DrinksIcon } from "./icons/Categories";
 import {
@@ -96,6 +96,14 @@ export function ProductsDataProvider({ children }: { children: ReactNode }) {
     async function load() {
       setLoading(true);
       setError(null);
+
+      if (!isSupabaseConfigured) {
+        setError(
+          "Supabase belum dikonfigurasi. Set NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY di environment variables."
+        );
+        setLoading(false);
+        return;
+      }
 
       const [catRes, prodRes] = await Promise.all([
         supabase.from("categories").select("*").order("sort_order"),

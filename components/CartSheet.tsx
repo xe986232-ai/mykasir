@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Banknote, CheckCircle2, ChevronLeft, Minus, Plus, QrCode, Trash2, Wallet, X } from "lucide-react";
 import { useCart } from "./CartContext";
 import AnimatedNumber from "./AnimatedNumber";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 type Step = "cart" | "payment" | "success";
 type PaymentMethod = "cash" | "qris" | "card";
@@ -52,6 +52,14 @@ export default function CartSheet({
   async function handleFinish() {
     setSaving(true);
     setSaveError(null);
+
+    if (!isSupabaseConfigured) {
+      setSaveError(
+        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      );
+      setSaving(false);
+      return;
+    }
 
     // Simpan transaksi + item-nya ke Supabase (tabel transactions & transaction_items).
     const { data: trx, error: trxError } = await supabase
