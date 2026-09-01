@@ -19,6 +19,7 @@ import {
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData, productIconMap } from "./ProductsDataContext";
+import { useBulkActions } from "./BulkActionsContext";
 
 const LONG_PRESS_MS = 480;
 
@@ -37,6 +38,7 @@ type AdminProductRow = {
 
 export default function KelolaProdukContent() {
   const { categories, getCategoryById, refetch: refetchShopData } = useProductsData();
+  const { setBulkActions, requestConfirm } = useBulkActions();
 
   const [rows, setRows] = useState<AdminProductRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,8 +52,6 @@ export default function KelolaProdukContent() {
   // Selama aktif, tap kartu lain tinggal toggle checkbox-nya.
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
-  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressFiredRef = useRef(false);
@@ -105,23 +105,41 @@ export default function KelolaProdukContent() {
 
   async function handleBulkDelete() {
     if (selectedIds.size === 0) return;
-    setBulkDeleting(true);
     const { error: deleteError } = await supabase
       .from("products")
       .delete()
       .in("id", Array.from(selectedIds));
-    setBulkDeleting(false);
 
     if (deleteError) {
       setError(deleteError.message || "Gagal menghapus produk terpilih.");
-      setShowBulkConfirm(false);
       return;
     }
 
-    setShowBulkConfirm(false);
     exitSelectMode();
     refetchAll();
   }
+
+  // Titipkan info seleksi & aksi hapus massal ke BulkActionsContext, yang
+  // nge-render bar & modalnya di level Frame (lihat AppShell) supaya
+  // posisinya beneran nempel di bawah layar, ga ikut kegeser scroll list.
+  useEffect(() => {
+    if (!selectMode) {
+      setBulkActions(null);
+      return;
+    }
+    setBulkActions({
+      count: selectedIds.size,
+      itemLabel: "produk",
+      onCancel: exitSelectMode,
+      onConfirmDelete: handleBulkDelete,
+    });
+  });
+
+  // Bersihin context pas komponen unmount (misal pindah halaman).
+  useEffect(() => {
+    return () => setBulkActions(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Berbeda dari halaman /produk (yang cuma nampilin produk is_active =
   // true buat browse), di sini kita ambil SEMUA produk (aktif & nonaktif)
@@ -215,7 +233,7 @@ export default function KelolaProdukContent() {
               {selectedIds.size} produk dipilih
             </p>
             <button
-              onClick={() => selectedIds.size > 0 && setShowBulkConfirm(true)}
+              onClick={requestConfirm}
               disabled={selectedIds.size === 0}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-badge/10 text-badge shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform disabled:opacity-40"
               aria-label="Hapus produk terpilih"
@@ -473,93 +491,6 @@ export default function KelolaProdukContent() {
           dikelompokkan.
         </p>
       )}
-
-      {/* Bar aksi hapus massal, muncul selama mode seleksi aktif */}
-      <AnimatePresence>
-        {selectMode && (
-          <motion.div
-            initial={{ y: 90, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 90, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 26 }}
-            className="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-[430px] items-center justify-between rounded-t-3xl bg-white px-5 py-4 shadow-[0_-8px_24px_rgba(20,24,20,0.15)]"
-          >
-            <button
-              onClick={exitSelectMode}
-              className="text-[12.5px] font-semibold text-gray active:scale-95 transition-transform"
-            >
-              Batal
-            </button>
-            <span className="text-[12.5px] font-semibold text-ink">
-              {selectedIds.size} dipilih
-            </span>
-            <button
-              onClick={() => selectedIds.size > 0 && setShowBulkConfirm(true)}
-              disabled={selectedIds.size === 0}
-              className="flex items-center gap-1.5 rounded-full bg-badge px-4 py-2.5 text-[12.5px] font-bold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform disabled:opacity-40"
-            >
-              <Trash2 size={14} />
-              Hapus
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Modal konfirmasi hapus massal */}
-      <AnimatePresence>
-        {showBulkConfirm && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => !bulkDeleting && setShowBulkConfirm(false)}
-              className="fixed inset-0 z-50 bg-black/40"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 10 }}
-              transition={{ type: "spring", damping: 26, stiffness: 320 }}
-              className="fixed inset-x-6 top-1/2 z-50 mx-auto max-w-[380px] -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl"
-            >
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-badge/10">
-                <Trash2 size={20} className="text-badge" />
-              </div>
-              <h2 className="mt-3 text-center text-[14.5px] font-bold text-ink">
-                Hapus {selectedIds.size} produk?
-              </h2>
-              <p className="mt-1 text-center text-[12px] text-gray">
-                Produk yang dipilih akan dihapus permanen dan tidak bisa dikembalikan.
-              </p>
-
-              <div className="mt-5 flex gap-2.5">
-                <button
-                  onClick={() => setShowBulkConfirm(false)}
-                  disabled={bulkDeleting}
-                  className="flex-1 rounded-2xl bg-gray-light py-3 text-[13px] font-bold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={handleBulkDelete}
-                  disabled={bulkDeleting}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-badge py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-60"
-                >
-                  {bulkDeleting ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin" />
-                      Menghapus...
-                    </>
-                  ) : (
-                    "Ya, Hapus"
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }

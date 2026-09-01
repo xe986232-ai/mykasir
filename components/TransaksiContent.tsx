@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   ChevronDown,
   Circle,
-  Loader2,
   QrCode,
   Receipt,
   RefreshCw,
@@ -19,6 +18,7 @@ import { useSidebar } from "./SidebarContext";
 import AnimatedNumber from "./AnimatedNumber";
 import { formatRupiah } from "@/lib/products";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { useBulkActions } from "./BulkActionsContext";
 
 type TransactionItemRow = {
   id: number;
@@ -331,12 +331,11 @@ export default function TransaksiContent() {
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { setBulkActions, requestConfirm } = useBulkActions();
 
   // Mode seleksi massal: aktif kalau kartu transaksi ditahan (long-press).
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
-  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   function handleLongPress(id: string) {
     setSelectMode(true);
@@ -359,7 +358,6 @@ export default function TransaksiContent() {
 
   async function handleBulkDelete() {
     if (selectedIds.size === 0) return;
-    setBulkDeleting(true);
     const ids = Array.from(selectedIds);
 
     // Hapus dulu transaction_items yang nunjuk ke transaksi terpilih,
@@ -371,9 +369,7 @@ export default function TransaksiContent() {
       .in("transaction_id", ids);
 
     if (itemsError) {
-      setBulkDeleting(false);
       setError(itemsError.message || "Gagal menghapus transaksi terpilih.");
-      setShowBulkConfirm(false);
       return;
     }
 
@@ -381,18 +377,37 @@ export default function TransaksiContent() {
       .from("transactions")
       .delete()
       .in("id", ids);
-    setBulkDeleting(false);
 
     if (deleteError) {
       setError(deleteError.message || "Gagal menghapus transaksi terpilih.");
-      setShowBulkConfirm(false);
       return;
     }
 
-    setShowBulkConfirm(false);
     exitSelectMode();
     load();
   }
+
+  // Titipkan info seleksi & aksi hapus massal ke BulkActionsContext, yang
+  // nge-render bar & modalnya di level Frame (lihat AppShell) supaya
+  // posisinya beneran nempel di bawah layar, ga ikut kegeser scroll list.
+  useEffect(() => {
+    if (!selectMode) {
+      setBulkActions(null);
+      return;
+    }
+    setBulkActions({
+      count: selectedIds.size,
+      itemLabel: "transaksi",
+      onCancel: exitSelectMode,
+      onConfirmDelete: handleBulkDelete,
+    });
+  });
+
+  // Bersihin context pas komponen unmount (misal pindah halaman).
+  useEffect(() => {
+    return () => setBulkActions(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function load() {
     setLoading(true);
@@ -433,7 +448,7 @@ export default function TransaksiContent() {
         selectMode={selectMode}
         selectedCount={selectedIds.size}
         onExitSelectMode={exitSelectMode}
-        onRequestBulkDelete={() => selectedIds.size > 0 && setShowBulkConfirm(true)}
+        onRequestBulkDelete={requestConfirm}
       />
       {!selectMode && transactions.length > 0 && (
         <p className="px-5 pt-1.5 text-[10.5px] text-gray/70">
@@ -470,93 +485,6 @@ export default function TransaksiContent() {
           />
         ))}
       </div>
-
-      {/* Bar aksi hapus massal, muncul selama mode seleksi aktif */}
-      <AnimatePresence>
-        {selectMode && (
-          <motion.div
-            initial={{ y: 90, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 90, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 26 }}
-            className="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-[430px] items-center justify-between rounded-t-3xl bg-white px-5 py-4 shadow-[0_-8px_24px_rgba(20,24,20,0.15)]"
-          >
-            <button
-              onClick={exitSelectMode}
-              className="text-[12.5px] font-semibold text-gray active:scale-95 transition-transform"
-            >
-              Batal
-            </button>
-            <span className="text-[12.5px] font-semibold text-ink">
-              {selectedIds.size} dipilih
-            </span>
-            <button
-              onClick={() => selectedIds.size > 0 && setShowBulkConfirm(true)}
-              disabled={selectedIds.size === 0}
-              className="flex items-center gap-1.5 rounded-full bg-badge px-4 py-2.5 text-[12.5px] font-bold text-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform disabled:opacity-40"
-            >
-              <Trash2 size={14} />
-              Hapus
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Modal konfirmasi hapus massal */}
-      <AnimatePresence>
-        {showBulkConfirm && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => !bulkDeleting && setShowBulkConfirm(false)}
-              className="fixed inset-0 z-50 bg-black/40"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 10 }}
-              transition={{ type: "spring", damping: 26, stiffness: 320 }}
-              className="fixed inset-x-6 top-1/2 z-50 mx-auto max-w-[380px] -translate-y-1/2 rounded-2xl bg-white p-5 shadow-xl"
-            >
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-badge/10">
-                <Trash2 size={20} className="text-badge" />
-              </div>
-              <h2 className="mt-3 text-center text-[14.5px] font-bold text-ink">
-                Hapus {selectedIds.size} transaksi?
-              </h2>
-              <p className="mt-1 text-center text-[12px] text-gray">
-                Transaksi yang dipilih akan dihapus permanen dan tidak bisa dikembalikan.
-              </p>
-
-              <div className="mt-5 flex gap-2.5">
-                <button
-                  onClick={() => setShowBulkConfirm(false)}
-                  disabled={bulkDeleting}
-                  className="flex-1 rounded-2xl bg-gray-light py-3 text-[13px] font-bold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={handleBulkDelete}
-                  disabled={bulkDeleting}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-badge py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-60"
-                >
-                  {bulkDeleting ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin" />
-                      Menghapus...
-                    </>
-                  ) : (
-                    "Ya, Hapus"
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }

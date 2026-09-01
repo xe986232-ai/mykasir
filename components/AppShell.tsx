@@ -5,8 +5,10 @@ import { SidebarProvider, useSidebar } from "./SidebarContext";
 import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
 import { CartProvider, useCart } from "./CartContext";
 import { ProductsDataProvider } from "./ProductsDataContext";
+import { BulkActionsProvider } from "./BulkActionsContext";
 import CartBottomBar from "./CartBottomBar";
 import CartSheet from "./CartSheet";
+import BulkActionsBar from "./BulkActionsBar";
 
 // Logic ini persis kayak di kode HTML: pas hamburger di-klik, "main-content"
 // (kartu halaman) di-geser ke kanan sejauh sidebar-width + gap buat
@@ -59,6 +61,7 @@ function Frame({ children }: { children: ReactNode }) {
           nempel bener ke bottom Frame, ga ikut kegeser scroll apa pun. */}
       <CartBottomBar />
       <CartSheet open={isSheetOpen} onClose={closeSheet} />
+      <BulkActionsBar />
     </div>
   );
 }
@@ -68,7 +71,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
     <ProductsDataProvider>
       <SidebarProvider>
         <CartProvider>
-          <Frame>{children}</Frame>
+          <BulkActionsProvider>
+            <Frame>{children}</Frame>
+          </BulkActionsProvider>
         </CartProvider>
       </SidebarProvider>
     </ProductsDataProvider>
