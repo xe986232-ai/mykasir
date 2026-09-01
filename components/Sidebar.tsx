@@ -51,7 +51,7 @@ const navSections = [
     label: "Menu",
     items: [
       { label: "Dashboard", href: "/", Icon: DashboardIcon },
-      { label: "Kasir", href: "#", Icon: ShoppingCart },
+      { label: "Kasir", href: "/kasir", Icon: ShoppingCart },
     ],
   },
   {

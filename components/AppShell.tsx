@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_GAP } from "./Sidebar";
+import { CartProvider } from "./CartContext";
 
 // Logic ini persis kayak di kode HTML: pas hamburger di-klik, "main-content"
 // (kartu halaman) di-geser ke kanan sejauh sidebar-width + gap buat
@@ -47,7 +48,9 @@ function Frame({ children }: { children: ReactNode }) {
 export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
-      <Frame>{children}</Frame>
+      <CartProvider>
+        <Frame>{children}</Frame>
+      </CartProvider>
     </SidebarProvider>
   );
 }

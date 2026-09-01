@@ -100,3 +100,17 @@ export function getProductsByCategory(id: CategoryId) {
 export function isCategoryId(value: string | undefined | null): value is CategoryId {
   return !!value && categories.some((c) => c.id === value);
 }
+
+/**
+ * Produk di sini disimpan harganya sebagai string tampilan (misal "6.50 AED").
+ * Buat kasir kita butuh angka mentahnya biar bisa dijumlahin — fungsi ini
+ * mecah string itu jadi { value, currency }. Kalau formatnya ga kebaca,
+ * fallback ke 0 biar ga bikin krash pas hitung total.
+ */
+export function parsePrice(price: string): { value: number; currency: string } {
+  const match = price.match(/^([\d.,]+)\s*(.*)$/);
+  if (!match) return { value: 0, currency: "" };
+
+  const value = parseFloat(match[1].replace(",", "."));
+  return { value: Number.isFinite(value) ? value : 0, currency: match[2] || "" };
+}

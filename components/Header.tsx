@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 import { ShoppingBag, Bell, ChevronDown } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
+import { useCart } from "./CartContext";
 
 export default function Header() {
   const { isOpen, toggle } = useSidebar();
+  const { itemCount } = useCart();
 
   return (
     <motion.header
@@ -52,6 +54,11 @@ export default function Header() {
           className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
         >
           <ShoppingBag size={18} strokeWidth={2} className="text-ink" />
+          {itemCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-badge px-1 text-[9px] font-bold text-white ring-2 ring-[#EFF1F0]">
+              {itemCount}
+            </span>
+          )}
         </button>
         <button
           aria-label="Notifications"
