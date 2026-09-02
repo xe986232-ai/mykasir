@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { SPLASH_DURATION_MS } from "./SplashScreen";
 import Header from "./Header";
 import SearchBar from "./SearchBar";
 import PromoBanner from "./PromoBanner";
@@ -35,7 +36,11 @@ export default function HomeContent() {
       <motion.div
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{
+          duration: 0.5,
+          delay: SPLASH_DURATION_MS / 1000,
+          ease: [0.22, 1, 0.36, 1],
+        }}
         className="relative -mt-6 rounded-t-[32px] bg-white pt-5 shadow-[0_-10px_24px_rgba(20,24,20,0.05)]"
       >
         <PromoBanner />
