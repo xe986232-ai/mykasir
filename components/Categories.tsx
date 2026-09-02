@@ -9,6 +9,12 @@ import { useProductsData } from "./ProductsDataContext";
 type CategoriesProps = {
   selected: CategoryId | null;
   onSelect: (id: CategoryId | null) => void;
+  // Dipakai HomeContent buat misahin baris icon kategori sama tombol
+  // "View/Show All Categories" — biar PromoBanner bisa disisipin di
+  // antara keduanya (banner sekarang pindah ke atas, sebelum kartu
+  // produk, bukan numpang di dalam kartu putih lagi). KasirContent
+  // masih pakai default (true), jadi tetep nampilin keduanya sekaligus.
+  showMoreButton?: boolean;
 };
 
 // Palet gradient custom niru referensi (tiap kategori dapet warna beda
@@ -32,7 +38,11 @@ const ACTIVE_ACCENT = "#2563eb";
 const ACTIVE_RING_GLOW =
   "0 0 0 3px rgba(37, 99, 235, 0.30), 0 6px 16px rgba(37, 99, 235, 0.30)";
 
-export default function Categories({ selected, onSelect }: CategoriesProps) {
+export default function Categories({
+  selected,
+  onSelect,
+  showMoreButton = true,
+}: CategoriesProps) {
   const { categories, loading } = useProductsData();
 
   // Sengaja ga render loading di sini — biar ga dobel sama LoadingScreen
@@ -95,13 +105,15 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
         })}
       </div>
 
-      <button
-        onClick={() => onSelect(null)}
-        className="mx-5 mt-5 flex w-[calc(100%-40px)] items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-[13px] font-semibold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
-      >
-        <DashboardIcon size={16} className="text-primary" />
-        {selected ? "Show All Categories" : "View More Categories"}
-      </button>
+      {showMoreButton && (
+        <button
+          onClick={() => onSelect(null)}
+          className="mx-5 mt-5 flex w-[calc(100%-40px)] items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-[13px] font-semibold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
+        >
+          <DashboardIcon size={16} className="text-primary" />
+          {selected ? "Show All Categories" : "View More Categories"}
+        </button>
+      )}
     </motion.div>
   );
 }

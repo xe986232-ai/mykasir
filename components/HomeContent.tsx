@@ -7,6 +7,7 @@ import Header from "./Header";
 import SearchBar from "./SearchBar";
 import PromoBanner from "./PromoBanner";
 import Categories from "./Categories";
+import MoreCategoriesButton from "./MoreCategoriesButton";
 import ProductSection from "./ProductSection";
 import { GradientBackground } from "./GradientBackground";
 import type { CategoryId } from "@/lib/products";
@@ -26,13 +27,24 @@ export default function HomeContent() {
 
         <Header />
         <SearchBar />
-        <Categories selected={selectedCategory} onSelect={setSelectedCategory} />
+        <Categories
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
+          showMoreButton={false}
+        />
+        <PromoBanner />
+        <MoreCategoriesButton
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
+        />
       </div>
 
       {/* Card putih yang "nekuk": rounded di atas & narik naik (-mt) biar
           nutup/overlap dikit ke zona gradient di atasnya, kasih efek
           folded-sheet kayak referensi. Animasi masuk: geser naik dari
-          bawah + fade-in pas halaman pertama kali dibuka. */}
+          bawah + fade-in pas halaman pertama kali dibuka. Sekarang cuma
+          bungkus ProductSection — PromoBanner & tombol kategori udah
+          pindah ke atas (di luar kartu), ga numpang di kartu produk lagi. */}
       <motion.div
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -43,7 +55,6 @@ export default function HomeContent() {
         }}
         className="relative -mt-6 rounded-t-[32px] bg-white pt-5 shadow-[0_-10px_24px_rgba(20,24,20,0.05)]"
       >
-        <PromoBanner />
         <ProductSection selectedCategory={selectedCategory} />
       </motion.div>
     </div>
