@@ -20,9 +20,11 @@ export default function HomeContent() {
           tema yang ada. */}
       <div className="relative overflow-hidden pb-8 pt-4">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-primary-light via-primary-light/50 to-transparent" />
-          <div className="absolute -top-16 -left-12 h-56 w-56 rounded-full bg-primary/25 blur-[64px]" />
-          <div className="absolute -top-8 -right-14 h-52 w-52 rounded-full bg-sidebar/20 blur-[64px]" />
+          <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-b from-primary-light via-primary-light/60 to-transparent" />
+          <div className="absolute -top-24 -left-20 h-80 w-80 rounded-full bg-primary/55 blur-[90px]" />
+          <div className="absolute -top-16 -right-24 h-96 w-96 rounded-full bg-sidebar/45 blur-[100px]" />
+          <div className="absolute top-10 left-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-primary/35 blur-[80px]" />
+          <div className="absolute top-24 right-0 h-56 w-56 rounded-full bg-sidebar/30 blur-[70px]" />
         </div>
 
         <Header />
