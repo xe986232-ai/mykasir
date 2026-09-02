@@ -208,8 +208,10 @@ export default function PromoBanner() {
           </AnimatePresence>
         </div>
 
-        {/* potongan kecil di tengah-bawah banner, tempat dot slider nangkring */}
-        <div className="absolute left-1/2 bottom-0 z-20 flex -translate-x-1/2 translate-y-1/2 items-center gap-1.5 rounded-full bg-page px-3 py-1.5 shadow-[0_2px_6px_rgba(20,24,20,0.10)]">
+        {/* potongan kecil di tengah-bawah banner, tempat dot slider nangkring.
+            Naikin dikit (translate-y-1/4, bukan 1/2) biar ga nongol lewat
+            batas bawah kartu putih di belakangnya; shadow dihapus biar nyatu. */}
+        <div className="absolute left-1/2 bottom-0 z-20 flex -translate-x-1/2 translate-y-1/4 items-center gap-1.5 rounded-full bg-page px-3 py-1.5">
           {slides.map((s, i) => (
             <button
               key={s.id}
