@@ -209,10 +209,9 @@ export default function PromoBanner() {
         </div>
 
         {/* potongan kecil di tengah-bawah banner, tempat dot slider nangkring.
-            Dikecilin (px-2.5 py-1, bukan px-3 py-1.5) dan diturunin dikit
-            (translate-y-1) biar sisi bawahnya pas sejajar sama sisi bawah
-            kartu putih di belakang banner (yang emang -inset-1 dari banner). */}
-        <div className="absolute left-1/2 bottom-0 z-20 flex -translate-x-1/2 translate-y-1 items-center gap-1.5 rounded-full bg-white px-2.5 py-1">
+            Vertical padding dikecilin lagi (py-0.5, bukan py-1) tapi
+            horizontal (px-2.5) tetap, dan diturunin lebih jauh (translate-y-2). */}
+        <div className="absolute left-1/2 bottom-0 z-20 flex -translate-x-1/2 translate-y-2 items-center gap-1.5 rounded-full bg-white px-2.5 py-0.5">
           {slides.map((s, i) => (
             <button
               key={s.id}
