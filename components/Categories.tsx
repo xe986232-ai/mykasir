@@ -17,15 +17,11 @@ type CategoriesProps = {
   showMoreButton?: boolean;
 };
 
-// Palet gradient custom niru referensi (tiap kategori dapet warna beda
-// gantian): peach, orange, pink, biru muda, orange-merah. Dipakein
-// bergantian per index, ga peduli tipe kategorinya image atau icon.
+// Semua kategori sekarang pakai satu palet biru (bukan gantian warna per
+// index lagi) + efek glass: warna dibikin transparan (rgba) biar keliatan
+// nembus, dipasangin backdrop-blur di elemennya biar kesan kaca buram.
 const CATEGORY_GRADIENTS = [
-  "linear-gradient(180deg, #FFC08A 0%, #FFFFFF 85%)",
-  "linear-gradient(180deg, #FF9F5A 0%, #FFFFFF 85%)",
-  "linear-gradient(180deg, #F28FB4 0%, #FFFFFF 85%)",
-  "linear-gradient(180deg, #8FD3F4 0%, #FFFFFF 85%)",
-  "linear-gradient(180deg, #FF7A50 0%, #FFFFFF 85%)",
+  "linear-gradient(180deg, rgba(96,165,250,0.55) 0%, rgba(191,219,254,0.35) 55%, rgba(255,255,255,0.25) 100%)",
 ];
 
 // Warna aksen "aktif" dipisah dari --color-primary (yang ikut ganti-ganti
@@ -77,7 +73,7 @@ export default function Categories({
                   background: gradient,
                   boxShadow: isActive ? ACTIVE_RING_GLOW : undefined,
                 }}
-                className="flex h-14 w-14 items-center justify-center rounded-full transition-shadow"
+                className="flex h-14 w-14 items-center justify-center rounded-full border border-white/50 backdrop-blur-md transition-shadow"
               >
                 {cat.type === "image" ? (
                   <Image
