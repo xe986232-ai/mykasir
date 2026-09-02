@@ -20,7 +20,7 @@ export default function LoadingScreen({
 }: LoadingScreenProps) {
   return (
     <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-page text-center">
-      <MorphingInfinity className={`${iconClassName} text-primary`} />
+      <MorphingInfinity className={`${iconClassName} text-[#ea4c89]`} />
       {label && <p className="text-[13px] text-gray">{label}</p>}
     </div>
   );
