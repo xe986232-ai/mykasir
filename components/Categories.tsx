@@ -54,7 +54,7 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
             >
               <div
                 style={{ background: gradient }}
-                className={`flex h-14 w-14 items-center justify-center rounded-full shadow-[0_6px_14px_rgba(20,24,20,0.12)] transition-shadow ${
+                className={`flex h-14 w-14 items-center justify-center rounded-full transition-shadow ${
                   isActive
                     ? "ring-2 ring-primary ring-offset-2 ring-offset-page"
                     : ""
