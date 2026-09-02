@@ -155,10 +155,10 @@ export default function PromoBanner() {
       className="mt-5 px-5"
     >
       <div className="relative">
-        {/* kartu belakang: outline putih tipis yang ngintip dikit di sisi
-            & bawah banner (bukan kartu solid berwarna kayak sebelumnya —
-            cuma garis tipis biar kesan "layered" tapi tetap halus). */}
-        <div className="absolute inset-x-2 -bottom-2 top-2 rounded-[26px] border-2 border-white/70" />
+        {/* kartu belakang: solid putih, sedikit lebih besar dari banner di
+            semua sisi (kiri, kanan, atas, bawah) biar ngintip tipis
+            di sekeliling, bukan cuma outline atau numpuk di bawah doang. */}
+        <div className="absolute -inset-2 rounded-[32px] bg-white" />
 
         {/* kartu banner utama */}
         <div className="relative h-[168px] w-full overflow-hidden rounded-3xl shadow-[0_10px_24px_rgba(20,24,20,0.08)]">
