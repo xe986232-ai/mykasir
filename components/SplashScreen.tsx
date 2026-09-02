@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-const SPLASH_DURATION_MS = 1700;
+export const SPLASH_DURATION_MS = 1700;
 
 // Splash screen simple: cuma nongol pas halaman UTAMA ("/") pertama kali
 // dibuka, logo Jarwoo "nyapu" muncul dari kiri ke kanan, terus abis
