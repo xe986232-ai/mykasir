@@ -18,8 +18,10 @@ type CategoriesProps = {
 };
 
 // Semua kategori sekarang pakai satu palet biru (bukan gantian warna per
-// index lagi) + efek glass: warna dibikin transparan (rgba) biar keliatan
-// nembus, dipasangin backdrop-blur di elemennya biar kesan kaca buram.
+// index lagi). Kesan "kaca" dibikin cuma dari gradient transparan + inner
+// highlight (box-shadow inset) di elemennya — sengaja TANPA backdrop-blur,
+// karena live blur di banyak elemen sekaligus bikin scroll kerasa berat
+// (mahal buat GPU, apalagi di HP low-end/webview).
 const CATEGORY_GRADIENTS = [
   "linear-gradient(180deg, rgba(96,165,250,0.55) 0%, rgba(191,219,254,0.35) 55%, rgba(255,255,255,0.25) 100%)",
 ];
@@ -71,9 +73,11 @@ export default function Categories({
               <div
                 style={{
                   background: gradient,
-                  boxShadow: isActive ? ACTIVE_RING_GLOW : undefined,
+                  boxShadow: isActive
+                    ? ACTIVE_RING_GLOW
+                    : "inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -3px 6px rgba(37,99,235,0.15)",
                 }}
-                className="flex h-14 w-14 items-center justify-center rounded-full border border-white/50 backdrop-blur-md transition-shadow"
+                className="flex h-14 w-14 items-center justify-center rounded-full border border-white/50 transition-shadow"
               >
                 {cat.type === "image" ? (
                   <Image
