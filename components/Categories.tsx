@@ -108,9 +108,15 @@ export default function Categories({
       {showMoreButton && (
         <button
           onClick={() => onSelect(null)}
-          className="mx-5 mt-5 flex w-[calc(100%-40px)] items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-[13px] font-semibold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(96,165,250,0.35) 0%, rgba(191,219,254,0.2) 100%)",
+            boxShadow:
+              "inset 0 1px 2px rgba(255,255,255,0.5), 0 2px 10px rgba(37,99,235,0.10)",
+          }}
+          className="mx-5 mt-5 flex w-[calc(100%-40px)] items-center justify-center gap-2 rounded-2xl border border-white/50 py-3.5 text-[13px] font-semibold text-[#2563eb] active:scale-[0.98] transition-transform"
         >
-          <DashboardIcon size={16} className="text-primary" />
+          <DashboardIcon size={16} className="text-[#2563eb]" />
           {selected ? "Show All Categories" : "View More Categories"}
         </button>
       )}
