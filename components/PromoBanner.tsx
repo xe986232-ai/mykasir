@@ -155,13 +155,13 @@ export default function PromoBanner() {
       className="mt-5 px-5"
     >
       <div className="relative">
-        {/* kartu belakang: solid putih, sedikit lebih besar dari banner di
-            semua sisi (kiri, kanan, atas, bawah) biar ngintip tipis
-            di sekeliling, bukan cuma outline atau numpuk di bawah doang. */}
-        <div className="absolute -inset-2 rounded-[32px] bg-white" />
+        {/* kartu belakang: solid putih, ngintip tipis di sekeliling banner
+            (jarak dikecilin dari -inset-2 ke -inset-1 biar lebih halus). */}
+        <div className="absolute -inset-1 rounded-[28px] bg-white" />
 
-        {/* kartu banner utama */}
-        <div className="relative h-[168px] w-full overflow-hidden rounded-3xl shadow-[0_10px_24px_rgba(20,24,20,0.08)]">
+        {/* kartu banner utama — shadow dihapus biar nyatu sama kartu putih
+            di belakangnya, bukan keliatan ngambang terpisah. */}
+        <div className="relative h-[168px] w-full overflow-hidden rounded-3xl">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={slide.id}
