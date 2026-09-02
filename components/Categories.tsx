@@ -11,6 +11,17 @@ type CategoriesProps = {
   onSelect: (id: CategoryId | null) => void;
 };
 
+// Palet gradient custom niru referensi (tiap kategori dapet warna beda
+// gantian): peach, orange, pink, biru muda, orange-merah. Dipakein
+// bergantian per index, ga peduli tipe kategorinya image atau icon.
+const CATEGORY_GRADIENTS = [
+  "linear-gradient(135deg, #FFE8D1 0%, #FFC08A 100%)",
+  "linear-gradient(135deg, #FFE3C2 0%, #FF9F5A 100%)",
+  "linear-gradient(135deg, #FBD9E4 0%, #F28FB4 100%)",
+  "linear-gradient(135deg, #D3F1FF 0%, #8FD3F4 100%)",
+  "linear-gradient(135deg, #FFE0C7 0%, #FF7A50 100%)",
+];
+
 export default function Categories({ selected, onSelect }: CategoriesProps) {
   const { categories, loading } = useProductsData();
 
@@ -30,8 +41,9 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
       className="mt-6"
     >
       <div className="flex items-start gap-3 overflow-x-auto px-5 pt-2 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {categories.map((cat) => {
+        {categories.map((cat, i) => {
           const isActive = selected === cat.id;
+          const gradient = CATEGORY_GRADIENTS[i % CATEGORY_GRADIENTS.length];
           return (
             <button
               key={cat.id}
@@ -41,7 +53,8 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
               className="flex shrink-0 flex-col items-center gap-2 active:scale-95 transition-transform"
             >
               <div
-                className={`flex h-14 w-14 items-center justify-center rounded-2xl transition-shadow ${
+                style={{ background: gradient }}
+                className={`flex h-14 w-14 items-center justify-center rounded-full shadow-[0_6px_14px_rgba(20,24,20,0.12)] transition-shadow ${
                   isActive
                     ? "ring-2 ring-primary ring-offset-2 ring-offset-page"
                     : ""
@@ -51,18 +64,13 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
                   <Image
                     src={cat.image}
                     alt={cat.label}
-                    width={56}
-                    height={56}
-                    className="h-14 w-14 rounded-2xl object-contain"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 object-contain drop-shadow-sm"
                     unoptimized
                   />
                 ) : (
-                  <div
-                    className="flex h-14 w-14 items-center justify-center rounded-2xl shadow-[0_6px_14px_rgba(20,24,20,0.1)]"
-                    style={{ backgroundColor: cat.bg }}
-                  >
-                    <cat.Icon />
-                  </div>
+                  <cat.Icon />
                 )}
               </div>
               <span
