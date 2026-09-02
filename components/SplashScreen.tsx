@@ -44,7 +44,7 @@ export default function SplashScreen() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="absolute inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-[#ea4c89]"
+          className="absolute inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-[#2563eb]"
         >
           <motion.div
             initial={{ clipPath: "inset(0 100% 0 0)" }}
