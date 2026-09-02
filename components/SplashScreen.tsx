@@ -44,7 +44,7 @@ export default function SplashScreen() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="absolute inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-white"
+          className="absolute inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-[#ea4c89]"
         >
           <motion.div
             initial={{ clipPath: "inset(0 100% 0 0)" }}
@@ -62,7 +62,7 @@ export default function SplashScreen() {
                 .logo-text {
                   font-family: 'Pacifico', cursive;
                   font-size: 72px;
-                  fill: #ea4c89;
+                  fill: #ffffff;
                 }
               `}</style>
               <text
@@ -80,7 +80,7 @@ export default function SplashScreen() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.7, ease: "easeOut" }}
-            className="text-[13px] font-medium text-gray"
+            className="text-[13px] font-medium text-white"
           >
             Sistem Kasir
           </motion.p>
