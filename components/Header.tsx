@@ -54,9 +54,9 @@ export default function Header() {
       <div className="flex items-center gap-2.5">
         <button
           aria-label="Cart"
-          className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+          className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-white/35 shadow-[0_4px_16px_rgba(20,24,20,0.06)] backdrop-blur-md transition-transform active:scale-95"
         >
-          <ShoppingBag size={18} strokeWidth={2} className="text-ink" />
+          <ShoppingBag size={18} strokeWidth={2} className="text-ink/80" />
           {itemCount > 0 && (
             <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-badge px-1 text-[9px] font-bold text-white ring-2 ring-page">
               {itemCount}
@@ -65,9 +65,9 @@ export default function Header() {
         </button>
         <button
           aria-label="Notifications"
-          className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-95 transition-transform"
+          className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-white/35 shadow-[0_4px_16px_rgba(20,24,20,0.06)] backdrop-blur-md transition-transform active:scale-95"
         >
-          <Bell size={18} strokeWidth={2} className="text-ink" />
+          <Bell size={18} strokeWidth={2} className="text-ink/80" />
           <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-badge px-1 text-[9px] font-bold text-white ring-2 ring-page">
             12
           </span>

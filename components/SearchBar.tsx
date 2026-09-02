@@ -18,13 +18,14 @@ export default function SearchBar() {
           placeholder="Cari produk..."
           className="w-full bg-transparent text-[13.5px] text-ink placeholder:text-ink/50 outline-none"
         />
+        <div className="h-5 w-px shrink-0 bg-ink/15" />
+        <button
+          aria-label="Filters"
+          className="shrink-0 text-ink/70 transition-transform active:scale-90"
+        >
+          <SlidersHorizontal size={17} />
+        </button>
       </div>
-      <button
-        aria-label="Filters"
-        className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-2xl border border-white/40 bg-white/35 shadow-[0_4px_16px_rgba(20,24,20,0.06)] backdrop-blur-md transition-transform active:scale-95"
-      >
-        <SlidersHorizontal size={17} className="text-ink/70" />
-      </button>
     </motion.div>
   );
 }
