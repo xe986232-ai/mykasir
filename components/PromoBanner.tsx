@@ -155,9 +155,6 @@ export default function PromoBanner() {
       className="mt-5 px-5"
     >
       <div className="relative">
-        {/* kartu belakang (efek stack), sedikit ngintip di sisi & bawah */}
-        <div className="absolute inset-x-2 -bottom-2 top-2 rounded-[26px] bg-[#DCEBD9]" />
-
         {/* kartu banner utama */}
         <div className="relative h-[168px] w-full overflow-hidden rounded-3xl shadow-[0_10px_24px_rgba(20,24,20,0.08)]">
           <AnimatePresence mode="wait" initial={false}>

@@ -27,12 +27,12 @@ export default function HomeContent() {
 
         <Header />
         <SearchBar />
+        <PromoBanner />
         <Categories
           selected={selectedCategory}
           onSelect={setSelectedCategory}
           showMoreButton={false}
         />
-        <PromoBanner />
         <MoreCategoriesButton
           selected={selectedCategory}
           onSelect={setSelectedCategory}
@@ -42,9 +42,9 @@ export default function HomeContent() {
       {/* Card putih yang "nekuk": rounded di atas & narik naik (-mt) biar
           nutup/overlap dikit ke zona gradient di atasnya, kasih efek
           folded-sheet kayak referensi. Animasi masuk: geser naik dari
-          bawah + fade-in pas halaman pertama kali dibuka. Sekarang cuma
-          bungkus ProductSection — PromoBanner & tombol kategori udah
-          pindah ke atas (di luar kartu), ga numpang di kartu produk lagi. */}
+          bawah + fade-in pas halaman pertama kali dibuka. Cuma bungkus
+          ProductSection — PromoBanner & tombol kategori ada di atas (di
+          luar kartu), urutannya: banner -> icon kategori -> tombol. */}
       <motion.div
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
