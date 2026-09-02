@@ -22,6 +22,16 @@ const CATEGORY_GRADIENTS = [
   "linear-gradient(180deg, #FF7A50 0%, #FFFFFF 85%)",
 ];
 
+// Warna aksen "aktif" dipisah dari --color-primary (yang ikut ganti-ganti
+// tema oranye/lime/terracotta) karena sekarang background homepage-nya
+// gradient biru custom (lihat GradientBackground.tsx) yang gak ikut tema.
+// Dipakein biru yang senada sama gradient itu (bukan hijau/oranye dari
+// tema) supaya nyatu, plus dibuat sebagai soft glow (bukan ring solid +
+// ring-offset warna flat) biar blend ke background, bukan nabrak.
+const ACTIVE_ACCENT = "#2563eb";
+const ACTIVE_RING_GLOW =
+  "0 0 0 3px rgba(37, 99, 235, 0.30), 0 6px 16px rgba(37, 99, 235, 0.30)";
+
 export default function Categories({ selected, onSelect }: CategoriesProps) {
   const { categories, loading } = useProductsData();
 
@@ -53,12 +63,11 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
               className="flex shrink-0 flex-col items-center gap-2 active:scale-95 transition-transform"
             >
               <div
-                style={{ background: gradient }}
-                className={`flex h-14 w-14 items-center justify-center rounded-full transition-shadow ${
-                  isActive
-                    ? "ring-2 ring-primary ring-offset-2 ring-offset-page"
-                    : ""
-                }`}
+                style={{
+                  background: gradient,
+                  boxShadow: isActive ? ACTIVE_RING_GLOW : undefined,
+                }}
+                className="flex h-14 w-14 items-center justify-center rounded-full transition-shadow"
               >
                 {cat.type === "image" ? (
                   <Image
@@ -74,8 +83,9 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
                 )}
               </div>
               <span
+                style={isActive ? { color: ACTIVE_ACCENT } : undefined}
                 className={`text-center text-[11px] leading-tight ${
-                  isActive ? "font-bold text-primary" : "font-medium text-ink"
+                  isActive ? "font-bold" : "font-medium text-ink"
                 }`}
               >
                 {cat.label}
