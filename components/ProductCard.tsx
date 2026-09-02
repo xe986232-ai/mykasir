@@ -17,7 +17,7 @@ export default function ProductCard({
   const [added, setAdded] = useState(false);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white p-3">
+    <div className="relative overflow-hidden rounded-2xl bg-white p-3 shadow-[0_2px_10px_rgba(20,24,20,0.06)]">
       {delivery && (
         <span className="absolute left-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-delivery px-2 py-1 text-[9px] font-bold text-white">
           <Truck size={10} strokeWidth={2.5} />
