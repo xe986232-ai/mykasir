@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { LayoutGrid } from "lucide-react";
+import DashboardIcon from "./icons/DashboardIcon";
 import type { CategoryId } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
 
@@ -99,7 +99,7 @@ export default function Categories({ selected, onSelect }: CategoriesProps) {
         onClick={() => onSelect(null)}
         className="mx-5 mt-5 flex w-[calc(100%-40px)] items-center justify-center gap-2 rounded-2xl bg-white py-3.5 text-[13px] font-semibold text-ink shadow-[0_2px_10px_rgba(20,24,20,0.06)] active:scale-[0.98] transition-transform"
       >
-        <LayoutGrid size={16} className="text-primary" />
+        <DashboardIcon size={16} className="text-primary" />
         {selected ? "Show All Categories" : "View More Categories"}
       </button>
     </motion.div>
