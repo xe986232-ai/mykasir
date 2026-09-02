@@ -15,11 +15,11 @@ type CategoriesProps = {
 // gantian): peach, orange, pink, biru muda, orange-merah. Dipakein
 // bergantian per index, ga peduli tipe kategorinya image atau icon.
 const CATEGORY_GRADIENTS = [
-  "linear-gradient(135deg, #FFE8D1 0%, #FFC08A 100%)",
-  "linear-gradient(135deg, #FFE3C2 0%, #FF9F5A 100%)",
-  "linear-gradient(135deg, #FBD9E4 0%, #F28FB4 100%)",
-  "linear-gradient(135deg, #D3F1FF 0%, #8FD3F4 100%)",
-  "linear-gradient(135deg, #FFE0C7 0%, #FF7A50 100%)",
+  "linear-gradient(180deg, #FFC08A 0%, #FFFFFF 85%)",
+  "linear-gradient(180deg, #FF9F5A 0%, #FFFFFF 85%)",
+  "linear-gradient(180deg, #F28FB4 0%, #FFFFFF 85%)",
+  "linear-gradient(180deg, #8FD3F4 0%, #FFFFFF 85%)",
+  "linear-gradient(180deg, #FF7A50 0%, #FFFFFF 85%)",
 ];
 
 export default function Categories({ selected, onSelect }: CategoriesProps) {
