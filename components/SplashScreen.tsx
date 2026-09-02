@@ -1,16 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SPLASH_DURATION_MS = 1700;
 
-// Splash screen simple: cuma nongol pas app pertama kali dibuka, logo Jarwoo
-// "nyapu" muncul dari kiri ke kanan, terus abis SPLASH_DURATION_MS fade-out
-// ilang sendiri, nampilin isi app di baliknya. Dirender sebagai
-// "absolute inset-0" (bukan fixed) karena ditaro di dalam Frame yang udah
-// "relative" — jadi nutupin persis area app frame-nya aja (h-dvh, max-w-430),
-// sama kayak trik yang dipake CartBottomBar/CartSheet.
+// Splash screen simple: cuma nongol pas halaman UTAMA ("/") pertama kali
+// dibuka, logo Jarwoo "nyapu" muncul dari kiri ke kanan, terus abis
+// SPLASH_DURATION_MS fade-out ilang sendiri, nampilin isi app di baliknya.
+// Dirender sebagai "absolute inset-0" (bukan fixed) karena ditaro di dalam
+// Frame yang udah "relative" — jadi nutupin persis area app frame-nya aja
+// (h-dvh, max-w-430), sama kayak trik yang dipake CartBottomBar/CartSheet.
+//
+// Sengaja dicek `pathname === "/"` biar splash CUMA muncul di halaman utama
+// (bukan tiap kali pindah/refresh halaman lain kayak /kasir, /transaksi,
+// dll) — komponen ini dirender sekali di AppShell yang membungkus semua
+// route, jadi filternya harus di sini.
 //
 // PENTING: ini SVG ASLI dari file public/jarwoo-logo.svg, di-inline
 // langsung sebagai JSX (bukan <img src="...svg">). Kalau dipanggil lewat
@@ -19,12 +25,17 @@ const SPLASH_DURATION_MS = 1700;
 // ga sesuai aslinya. Di-inline gini, @import-nya jalan normal kayak CSS
 // biasa di halaman.
 export default function SplashScreen() {
-  const [visible, setVisible] = useState(true);
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
+  const [visible, setVisible] = useState(isHomePage);
 
   useEffect(() => {
+    if (!isHomePage) return;
     const timer = setTimeout(() => setVisible(false), SPLASH_DURATION_MS);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isHomePage]);
+
+  if (!isHomePage) return null;
 
   return (
     <AnimatePresence>
