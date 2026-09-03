@@ -4,11 +4,32 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-import { NotFoundException } from "@zxing/library";
+import { BarcodeFormat, DecodeHintType, NotFoundException } from "@zxing/library";
 import { CameraOff, X } from "lucide-react";
 
 const CAMERA_ERROR_MESSAGE =
   "Ga bisa akses kamera. Pastikan izin kamera diaktifkan di browser.";
+
+// Konfigurasi ZXing bawaan (tanpa hints) cukup "pelan" buat barcode retail
+// asli — sering gagal kalau agak miring, buram, atau di permukaan
+// mengkilap/melengkung kayak kemasan produk. TRY_HARDER nyalain pass
+// tambahan yang lebih toleran (lebih berat dikit secara CPU, tapi masih
+// lancar buat scan sesekali kayak gini). POSSIBLE_FORMATS dibatasin ke
+// format yang relevan buat kasir (barcode retail + QR) biar decoder ga
+// buang waktu nyoba format yang ga bakal kepake (Aztec, PDF417, dll).
+const scanHints = new Map<DecodeHintType, unknown>();
+scanHints.set(DecodeHintType.TRY_HARDER, true);
+scanHints.set(DecodeHintType.POSSIBLE_FORMATS, [
+  BarcodeFormat.EAN_13,
+  BarcodeFormat.EAN_8,
+  BarcodeFormat.UPC_A,
+  BarcodeFormat.UPC_E,
+  BarcodeFormat.CODE_128,
+  BarcodeFormat.CODE_39,
+  BarcodeFormat.CODABAR,
+  BarcodeFormat.ITF,
+  BarcodeFormat.QR_CODE,
+]);
 
 /**
  * Nyalain kamera & scan barcode terus-menerus sampe ketemu satu kode.
@@ -24,25 +45,39 @@ function ScannerView({ onDetected }: { onDetected: (code: string) => void }) {
 
   useEffect(() => {
     let cancelled = false;
-    let controls: Awaited<ReturnType<BrowserMultiFormatReader["decodeFromVideoDevice"]>> | null =
+    let controls: Awaited<ReturnType<BrowserMultiFormatReader["decodeFromConstraints"]>> | null =
       null;
-    const reader = new BrowserMultiFormatReader();
+    const reader = new BrowserMultiFormatReader(scanHints);
 
+    // Minta resolusi tinggi (bukan cuma facingMode kayak decodeFromVideoDevice
+    // bawaan) — kamera default browser sering milih resolusi rendah yang
+    // bikin barcode kecil/rapat susah kebaca. "ideal" = permintaan, bukan
+    // syarat mutlak, jadi tetep jalan di device yang kameranya lebih rendah.
     reader
-      .decodeFromVideoDevice(undefined, videoRef.current ?? undefined, (result, err) => {
-        if (cancelled || detectedRef.current) return;
-        if (result) {
-          detectedRef.current = true;
-          onDetected(result.getText());
-          return;
+      .decodeFromConstraints(
+        {
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+        },
+        videoRef.current ?? undefined,
+        (result, err) => {
+          if (cancelled || detectedRef.current) return;
+          if (result) {
+            detectedRef.current = true;
+            onDetected(result.getText());
+            return;
+          }
+          // NotFoundException dilempar terus-terusan tiap frame yang ga ada
+          // barcode-nya — itu normal, bukan error beneran. Error lain (misal
+          // izin kamera ditolak) baru kita tampilin ke user.
+          if (err && !(err instanceof NotFoundException)) {
+            setError(CAMERA_ERROR_MESSAGE);
+          }
         }
-        // NotFoundException dilempar terus-terusan tiap frame yang ga ada
-        // barcode-nya — itu normal, bukan error beneran. Error lain (misal
-        // izin kamera ditolak) baru kita tampilin ke user.
-        if (err && !(err instanceof NotFoundException)) {
-          setError(CAMERA_ERROR_MESSAGE);
-        }
-      })
+      )
       .then((c) => {
         if (cancelled) {
           c.stop();
