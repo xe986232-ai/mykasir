@@ -5,11 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, ImageOff } from "lucide-react";
+import { ArrowLeft, Barcode, Check, ImageOff } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
 import { MorphingInfinity } from "./MorphingInfinity";
+import BarcodeScannerModal from "./BarcodeScannerModal";
 
 // Daftar icon_key bawaan yang beneran punya komponen icon di
 // ProductsDataContext (lihat productIconMap di sana). Kalau produk baru
@@ -89,11 +90,13 @@ export default function TambahProdukForm() {
   const [brand, setBrand] = useState("");
   const [unit, setUnit] = useState("");
   const [price, setPrice] = useState("");
+  const [barcode, setBarcode] = useState("");
   const [delivery, setDelivery] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [image, setImage] = useState("");
   const [iconKey, setIconKey] = useState("");
   const [imageError, setImageError] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +110,7 @@ export default function TambahProdukForm() {
     setBrand("");
     setUnit("");
     setPrice("");
+    setBarcode("");
     setDelivery(false);
     setIsActive(true);
     setImage("");
@@ -139,6 +143,7 @@ export default function TambahProdukForm() {
       delivery,
       category_id: categoryId,
       brand: brand.trim() || null,
+      barcode: barcode.trim() || null,
       icon_key: image.trim() ? null : iconKey || null,
       image: image.trim() || null,
       is_active: isActive,
@@ -146,7 +151,11 @@ export default function TambahProdukForm() {
     setSaving(false);
 
     if (insertError) {
-      setError(insertError.message || "Gagal menyimpan produk ke Supabase.");
+      setError(
+        insertError.code === "23505"
+          ? "Barcode ini udah dipakai produk lain."
+          : insertError.message || "Gagal menyimpan produk ke Supabase."
+      );
       return;
     }
 
@@ -268,7 +277,7 @@ export default function TambahProdukForm() {
             </p>
           </div>
 
-          <div>
+          <div className="mb-3">
             <FieldLabel required>Satuan</FieldLabel>
             <input
               value={unit}
@@ -276,6 +285,29 @@ export default function TambahProdukForm() {
               placeholder="Misal: per kg, 1 botol, 1 pak"
               className={inputClass}
             />
+          </div>
+
+          <div>
+            <FieldLabel>Barcode</FieldLabel>
+            <div className="flex items-center gap-2">
+              <input
+                value={barcode}
+                onChange={(e) => setBarcode(e.target.value)}
+                placeholder="Scan atau ketik manual"
+                className={inputClass}
+              />
+              <button
+                type="button"
+                onClick={() => setScannerOpen(true)}
+                aria-label="Scan barcode"
+                className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary active:scale-95 transition-transform"
+              >
+                <Barcode size={18} />
+              </button>
+            </div>
+            <p className="mt-1.5 text-[11px] text-gray">
+              Opsional. Kalau diisi, produk bisa dicari lewat scan barcode di halaman Kasir.
+            </p>
           </div>
         </section>
 
@@ -397,6 +429,16 @@ export default function TambahProdukForm() {
           )}
         </button>
       </motion.form>
+
+      <BarcodeScannerModal
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onDetected={(code) => {
+          setBarcode(code);
+          setScannerOpen(false);
+        }}
+        helperText="Arahkan kamera ke barcode produk"
+      />
     </>
   );
 }

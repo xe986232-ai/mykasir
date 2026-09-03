@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
+  Barcode,
   Check,
   ImageOff,
   Trash2,
@@ -16,6 +17,7 @@ import { formatRupiah } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
 import { MorphingInfinity } from "./MorphingInfinity";
 import LoadingScreen from "./LoadingScreen";
+import BarcodeScannerModal from "./BarcodeScannerModal";
 
 // Sama seperti di TambahProdukForm — daftar icon_key bawaan yang punya
 // komponen icon di ProductsDataContext, dipakai kalau produk ga punya
@@ -99,6 +101,7 @@ type ProductRow = {
   image: string | null;
   is_active: boolean | null;
   brand: string | null;
+  barcode: string | null;
 };
 
 export default function EditProdukForm({ productId }: EditProdukFormProps) {
@@ -114,11 +117,13 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
   const [brand, setBrand] = useState("");
   const [unit, setUnit] = useState("");
   const [price, setPrice] = useState("");
+  const [barcode, setBarcode] = useState("");
   const [delivery, setDelivery] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [image, setImage] = useState("");
   const [iconKey, setIconKey] = useState("");
   const [imageError, setImageError] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -170,6 +175,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
       setBrand(p.brand ?? "");
       setUnit(p.unit);
       setPrice(String(Number(p.price) || ""));
+      setBarcode(p.barcode ?? "");
       setDelivery(p.delivery ?? false);
       setIsActive(p.is_active ?? true);
       setImage(p.image ?? "");
@@ -210,6 +216,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
         delivery,
         category_id: categoryId,
         brand: brand.trim() || null,
+        barcode: barcode.trim() || null,
         icon_key: image.trim() ? null : iconKey || null,
         image: image.trim() || null,
         is_active: isActive,
@@ -218,7 +225,11 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
     setSaving(false);
 
     if (updateError) {
-      setError(updateError.message || "Gagal menyimpan perubahan produk.");
+      setError(
+        updateError.code === "23505"
+          ? "Barcode ini udah dipakai produk lain."
+          : updateError.message || "Gagal menyimpan perubahan produk."
+      );
       return;
     }
 
@@ -384,7 +395,7 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
             </p>
           </div>
 
-          <div>
+          <div className="mb-3">
             <FieldLabel required>Satuan</FieldLabel>
             <input
               value={unit}
@@ -392,6 +403,29 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
               placeholder="Misal: per kg, 1 botol, 1 pak"
               className={inputClass}
             />
+          </div>
+
+          <div>
+            <FieldLabel>Barcode</FieldLabel>
+            <div className="flex items-center gap-2">
+              <input
+                value={barcode}
+                onChange={(e) => setBarcode(e.target.value)}
+                placeholder="Scan atau ketik manual"
+                className={inputClass}
+              />
+              <button
+                type="button"
+                onClick={() => setScannerOpen(true)}
+                aria-label="Scan barcode"
+                className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary active:scale-95 transition-transform"
+              >
+                <Barcode size={18} />
+              </button>
+            </div>
+            <p className="mt-1.5 text-[11px] text-gray">
+              Opsional. Kalau diisi, produk bisa dicari lewat scan barcode di halaman Kasir.
+            </p>
           </div>
         </section>
 
@@ -591,6 +625,16 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
           </>
         )}
       </AnimatePresence>
+
+      <BarcodeScannerModal
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onDetected={(code) => {
+          setBarcode(code);
+          setScannerOpen(false);
+        }}
+        helperText="Arahkan kamera ke barcode produk"
+      />
     </>
   );
 }

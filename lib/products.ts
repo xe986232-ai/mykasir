@@ -27,6 +27,7 @@ export type Product = {
   delivery?: boolean;
   category: CategoryId;
   brand?: string | null;
+  barcode?: string | null;
   Icon?: () => React.ReactElement;
   image?: string;
 };

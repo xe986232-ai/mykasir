@@ -69,6 +69,7 @@ type ProductRow = {
   image: string | null;
   is_active: boolean | null;
   brand: string | null;
+  barcode: string | null;
 };
 
 type ProductsDataValue = {
@@ -79,6 +80,7 @@ type ProductsDataValue = {
   getCategoryById: (id: CategoryId | string | null | undefined) => Category | undefined;
   isCategoryId: (value: string | undefined | null) => value is CategoryId;
   getProductsByCategory: (id: CategoryId) => Product[];
+  getProductByBarcode: (code: string) => Product | undefined;
   refetch: () => void;
 };
 
@@ -146,6 +148,7 @@ export function ProductsDataProvider({ children }: { children: ReactNode }) {
         delivery: p.delivery ?? false,
         category: p.category_id,
         brand: p.brand,
+        barcode: p.barcode,
         Icon: p.icon_key ? productIconMap[p.icon_key] : undefined,
         image: p.image ?? undefined,
       }));
@@ -177,6 +180,18 @@ export function ProductsDataProvider({ children }: { children: ReactNode }) {
     [products]
   );
 
+  // Dipakai fitur scan barcode: cari produk lewat kode yang ke-scan kamera.
+  // Barcode disimpan apa adanya di Supabase, jadi cocokinnya exact match
+  // (barcode reader ngasih string digit persis, ga perlu normalisasi berat).
+  const getProductByBarcode = useCallback(
+    (code: string) => {
+      const trimmed = code.trim();
+      if (!trimmed) return undefined;
+      return products.find((p) => p.barcode && p.barcode.trim() === trimmed);
+    },
+    [products]
+  );
+
   const refetch = useCallback(() => setVersion((v) => v + 1), []);
 
   const value = useMemo(
@@ -188,9 +203,20 @@ export function ProductsDataProvider({ children }: { children: ReactNode }) {
       getCategoryById,
       isCategoryId,
       getProductsByCategory,
+      getProductByBarcode,
       refetch,
     }),
-    [categories, products, loading, error, getCategoryById, isCategoryId, getProductsByCategory, refetch]
+    [
+      categories,
+      products,
+      loading,
+      error,
+      getCategoryById,
+      isCategoryId,
+      getProductsByCategory,
+      getProductByBarcode,
+      refetch,
+    ]
   );
 
   return <ProductsDataContext.Provider value={value}>{children}</ProductsDataContext.Provider>;
