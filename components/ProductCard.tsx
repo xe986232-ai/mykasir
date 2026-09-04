@@ -62,7 +62,7 @@ export default function ProductCard({
           }}
           whileTap={{ scale: 0.85 }}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-white"
-          style={{ backgroundColor: added ? "#1F9D3F" : "#2FB350" }}
+          style={{ backgroundColor: "var(--color-primary)" }}
         >
           <motion.span
             key={added ? "check" : "plus"}
