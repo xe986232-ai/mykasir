@@ -25,10 +25,10 @@ export const THEMES: ThemeOption[] = [
   },
   {
     id: "navy",
-    name: "Navy + lime",
-    description: "Biru gelap modern dengan aksen hijau lime",
+    name: "Navy + blue",
+    description: "Biru gelap modern dengan aksen biru cerah",
     sidebar: "#1e3a5f",
-    accent: "#65a30d",
+    accent: "#3b6df0",
   },
   {
     id: "charcoal",
