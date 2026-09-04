@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Banknote, CheckCircle2, ChevronLeft, Minus, Plus, QrCode, Trash2, Wallet, X } from "lucide-react";
 import { useCart } from "./CartContext";
+import { useAlert } from "./AlertContext";
 import AnimatedNumber from "./AnimatedNumber";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
@@ -29,11 +30,11 @@ export default function CartSheet({
   onClose: () => void;
 }) {
   const { items, subtotal, currency, increment, decrement, removeItem, clearCart } = useCart();
+  const { showAlert } = useAlert();
   const [step, setStep] = useState<Step>("cart");
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const [cashInput, setCashInput] = useState("");
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
 
   const cashReceived = parseFloat(cashInput.replace(",", ".")) || 0;
   const change = cashReceived - subtotal;
@@ -45,17 +46,16 @@ export default function CartSheet({
       setStep("cart");
       setMethod("cash");
       setCashInput("");
-      setSaveError(null);
     }, 250);
   }
 
   async function handleFinish() {
     setSaving(true);
-    setSaveError(null);
 
     if (!isSupabaseConfigured) {
-      setSaveError(
-        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      showAlert(
+        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+        "error"
       );
       setSaving(false);
       return;
@@ -75,7 +75,7 @@ export default function CartSheet({
       .single();
 
     if (trxError || !trx) {
-      setSaveError(trxError?.message ?? "Gagal menyimpan transaksi.");
+      showAlert(trxError?.message ?? "Gagal menyimpan transaksi.", "error");
       setSaving(false);
       return;
     }
@@ -95,7 +95,7 @@ export default function CartSheet({
     setSaving(false);
 
     if (itemsError) {
-      setSaveError(itemsError.message);
+      showAlert(itemsError.message, "error");
       return;
     }
 
@@ -308,12 +308,6 @@ export default function CartSheet({
                     </div>
                   )}
                 </div>
-
-                {saveError && (
-                  <p className="mt-3 text-center text-[11.5px] font-medium text-badge">
-                    {saveError}
-                  </p>
-                )}
 
                 <button
                   disabled={(method === "cash" && cashReceived < subtotal) || saving}

@@ -7,6 +7,8 @@ import { CartProvider, useCart } from "./CartContext";
 import { ProductsDataProvider } from "./ProductsDataContext";
 import { BulkActionsProvider } from "./BulkActionsContext";
 import { ThemeProvider } from "./ThemeContext";
+import { AlertProvider } from "./AlertContext";
+import AlertOverlay from "./AlertOverlay";
 import CartBottomBar from "./CartBottomBar";
 import CartSheet from "./CartSheet";
 import BulkActionsBar from "./BulkActionsBar";
@@ -68,6 +70,10 @@ function Frame({ children }: { children: ReactNode }) {
       {/* Nutup seluruh Frame pas app pertama kali mount, ilang sendiri
           abis sekejap. z-[60] biar di atas modal cart/bulk actions (z-50). */}
       <SplashScreen />
+
+      {/* Toast alert kustom (pengganti window.alert bawaan browser) —
+          z-[70] biar selalu di paling atas, di atas splash screen sekalipun. */}
+      <AlertOverlay />
     </div>
   );
 }
@@ -79,7 +85,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <SidebarProvider>
           <CartProvider>
             <BulkActionsProvider>
-              <Frame>{children}</Frame>
+              <AlertProvider>
+                <Frame>{children}</Frame>
+              </AlertProvider>
             </BulkActionsProvider>
           </CartProvider>
         </SidebarProvider>

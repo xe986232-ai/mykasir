@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, ImageOff, Trash2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useProductsData } from "./ProductsDataContext";
+import { useAlert } from "./AlertContext";
 import { MorphingInfinity } from "./MorphingInfinity";
 import LoadingScreen from "./LoadingScreen";
 
@@ -52,6 +53,7 @@ type CategoryRow = {
 export default function EditKategoriForm({ categoryId }: EditKategoriFormProps) {
   const router = useRouter();
   const { refetch } = useProductsData();
+  const { showAlert } = useAlert();
 
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -67,12 +69,10 @@ export default function EditKategoriForm({ categoryId }: EditKategoriFormProps) 
   const [sortOrder, setSortOrder] = useState("1");
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Ambil data kategori yang mau diedit + jumlah produk yang masih
   // memakainya (buat peringatan sebelum hapus).
@@ -130,19 +130,19 @@ export default function EditKategoriForm({ categoryId }: EditKategoriFormProps) 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
 
     const sortValue = parseInt(sortOrder, 10);
 
-    if (!label.trim()) return setError("Nama kategori wajib diisi.");
+    if (!label.trim()) return showAlert("Nama kategori wajib diisi.", "error");
     if (displayType === "image" && !image.trim()) {
-      return setError("URL gambar wajib diisi kalau tipe tampilannya Gambar.");
+      return showAlert("URL gambar wajib diisi kalau tipe tampilannya Gambar.", "error");
     }
-    if (!Number.isFinite(sortValue)) return setError("Urutan harus berupa angka.");
+    if (!Number.isFinite(sortValue)) return showAlert("Urutan harus berupa angka.", "error");
 
     if (!isSupabaseConfigured) {
-      setError(
-        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      showAlert(
+        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+        "error"
       );
       return;
     }
@@ -162,27 +162,28 @@ export default function EditKategoriForm({ categoryId }: EditKategoriFormProps) 
     setSaving(false);
 
     if (updateError) {
-      setError(updateError.message || "Gagal menyimpan perubahan kategori.");
+      showAlert(updateError.message || "Gagal menyimpan perubahan kategori.", "error");
       return;
     }
 
     refetch();
+    showAlert("Perubahan kategori berhasil disimpan.", "success");
     setSuccess(true);
   }
 
   async function handleConfirmDelete() {
     setDeleting(true);
-    setDeleteError(null);
 
     const { error: deleteErr } = await supabase.from("categories").delete().eq("id", categoryId);
     setDeleting(false);
 
     if (deleteErr) {
-      setDeleteError(deleteErr.message || "Gagal menghapus kategori.");
+      showAlert(deleteErr.message || "Gagal menghapus kategori.", "error");
       return;
     }
 
     refetch();
+    showAlert(`Kategori "${label}" berhasil dihapus.`, "success");
     router.push("/kategori/kelola");
   }
 
@@ -417,12 +418,6 @@ export default function EditKategoriForm({ categoryId }: EditKategoriFormProps) 
           <p className="mt-1.5 text-[11px] text-gray">Angka lebih kecil tampil lebih dulu.</p>
         </section>
 
-        {error && (
-          <p className="rounded-xl bg-badge/10 px-3.5 py-3 text-[12px] font-medium text-badge">
-            {error}
-          </p>
-        )}
-
         <button
           type="submit"
           disabled={saving}
@@ -491,12 +486,6 @@ export default function EditKategoriForm({ categoryId }: EditKategoriFormProps) 
                   </>
                 )}
               </p>
-
-              {deleteError && (
-                <p className="mt-3 rounded-xl bg-badge/10 px-3 py-2 text-center text-[11.5px] font-medium text-badge">
-                  {deleteError}
-                </p>
-              )}
 
               <div className="mt-5 flex gap-2.5">
                 <button

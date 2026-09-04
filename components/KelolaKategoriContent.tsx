@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Plus, Search, Tag, Trash2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { categoryIconMap, useProductsData } from "./ProductsDataContext";
+import { useAlert } from "./AlertContext";
 import { MorphingInfinity } from "./MorphingInfinity";
 import LoadingScreen from "./LoadingScreen";
 
@@ -22,6 +23,7 @@ type AdminCategoryRow = {
 
 export default function KelolaKategoriContent() {
   const { refetch: refetchShopData } = useProductsData();
+  const { showAlert } = useAlert();
 
   const [rows, setRows] = useState<AdminCategoryRow[]>([]);
   // Jumlah produk per category_id, dipakai buat kasih peringatan pas mau
@@ -34,7 +36,6 @@ export default function KelolaKategoriContent() {
 
   const [deleteTarget, setDeleteTarget] = useState<AdminCategoryRow | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Ambil SEMUA kategori langsung dari Supabase (bukan lewat context) biar
   // konsisten dengan pola KelolaProdukContent — halaman admin selalu fetch
@@ -91,14 +92,12 @@ export default function KelolaKategoriContent() {
   }
 
   function openDeleteConfirm(row: AdminCategoryRow) {
-    setDeleteError(null);
     setDeleteTarget(row);
   }
 
   async function handleConfirmDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-    setDeleteError(null);
 
     const { error: deleteErr } = await supabase
       .from("categories")
@@ -107,10 +106,11 @@ export default function KelolaKategoriContent() {
     setDeleting(false);
 
     if (deleteErr) {
-      setDeleteError(deleteErr.message || "Gagal menghapus kategori.");
+      showAlert(deleteErr.message || "Gagal menghapus kategori.", "error");
       return;
     }
 
+    showAlert(`Kategori "${deleteTarget.label}" berhasil dihapus.`, "success");
     setDeleteTarget(null);
     refetchAll();
   }
@@ -282,12 +282,6 @@ export default function KelolaKategoriContent() {
                   </>
                 )}
               </p>
-
-              {deleteError && (
-                <p className="mt-3 rounded-xl bg-badge/10 px-3 py-2 text-center text-[11.5px] font-medium text-badge">
-                  {deleteError}
-                </p>
-              )}
 
               <div className="mt-5 flex gap-2.5">
                 <button

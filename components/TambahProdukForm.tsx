@@ -9,6 +9,7 @@ import { ArrowLeft, Barcode, Check, ImageOff } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
+import { useAlert } from "./AlertContext";
 import { MorphingInfinity } from "./MorphingInfinity";
 import BarcodeScannerModal from "./BarcodeScannerModal";
 
@@ -84,6 +85,7 @@ const inputClass =
 export default function TambahProdukForm() {
   const router = useRouter();
   const { categories, refetch } = useProductsData();
+  const { showAlert } = useAlert();
 
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -99,7 +101,6 @@ export default function TambahProdukForm() {
   const [scannerOpen, setScannerOpen] = useState(false);
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const priceValue = parseFloat(price.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
@@ -120,16 +121,16 @@ export default function TambahProdukForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
 
-    if (!name.trim()) return setError("Nama produk wajib diisi.");
-    if (!categoryId) return setError("Pilih kategori produk dulu.");
-    if (!unit.trim()) return setError("Satuan produk wajib diisi (misal: per kg, 1 botol).");
-    if (priceValue <= 0) return setError("Harga produk harus lebih dari 0.");
+    if (!name.trim()) return showAlert("Nama produk wajib diisi.", "error");
+    if (!categoryId) return showAlert("Pilih kategori produk dulu.", "error");
+    if (!unit.trim()) return showAlert("Satuan produk wajib diisi (misal: per kg, 1 botol).", "error");
+    if (priceValue <= 0) return showAlert("Harga produk harus lebih dari 0.", "error");
 
     if (!isSupabaseConfigured) {
-      setError(
-        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      showAlert(
+        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+        "error"
       );
       return;
     }
@@ -151,15 +152,17 @@ export default function TambahProdukForm() {
     setSaving(false);
 
     if (insertError) {
-      setError(
+      showAlert(
         insertError.code === "23505"
           ? "Barcode ini udah dipakai produk lain."
-          : insertError.message || "Gagal menyimpan produk ke Supabase."
+          : insertError.message || "Gagal menyimpan produk ke Supabase.",
+        "error"
       );
       return;
     }
 
     refetch();
+    showAlert(`Produk "${name.trim()}" berhasil ditambahkan.`, "success");
     setSuccess(true);
   }
 
@@ -407,12 +410,6 @@ export default function TambahProdukForm() {
             onChange={setIsActive}
           />
         </section>
-
-        {error && (
-          <p className="rounded-xl bg-badge/10 px-3.5 py-3 text-[12px] font-medium text-badge">
-            {error}
-          </p>
-        )}
 
         <button
           type="submit"

@@ -19,6 +19,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData, productIconMap } from "./ProductsDataContext";
 import { useBulkActions } from "./BulkActionsContext";
+import { useAlert } from "./AlertContext";
 import { MorphingInfinity } from "./MorphingInfinity";
 import LoadingScreen from "./LoadingScreen";
 
@@ -40,6 +41,7 @@ type AdminProductRow = {
 export default function KelolaProdukContent() {
   const { categories, getCategoryById, refetch: refetchShopData } = useProductsData();
   const { setBulkActions, requestConfirm } = useBulkActions();
+  const { showAlert } = useAlert();
 
   const [rows, setRows] = useState<AdminProductRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,16 +108,18 @@ export default function KelolaProdukContent() {
 
   async function handleBulkDelete() {
     if (selectedIds.size === 0) return;
+    const count = selectedIds.size;
     const { error: deleteError } = await supabase
       .from("products")
       .delete()
       .in("id", Array.from(selectedIds));
 
     if (deleteError) {
-      setError(deleteError.message || "Gagal menghapus produk terpilih.");
+      showAlert(deleteError.message || "Gagal menghapus produk terpilih.", "error");
       return;
     }
 
+    showAlert(`${count} produk berhasil dihapus.`, "success");
     exitSelectMode();
     refetchAll();
   }
@@ -198,11 +202,12 @@ export default function KelolaProdukContent() {
     setDeleting(false);
 
     if (deleteError) {
-      setError(deleteError.message || "Gagal menghapus produk.");
+      showAlert(deleteError.message || "Gagal menghapus produk.", "error");
       setDeleteTarget(null);
       return;
     }
 
+    showAlert(`Produk "${deleteTarget.name}" berhasil dihapus.`, "success");
     setDeleteTarget(null);
     refetchAll();
   }

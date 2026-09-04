@@ -18,6 +18,7 @@ import { useSidebar } from "./SidebarContext";
 import AnimatedNumber from "./AnimatedNumber";
 import { formatRupiah } from "@/lib/products";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { useAlert } from "./AlertContext";
 import LoadingScreen from "./LoadingScreen";
 import { MorphingInfinity } from "./MorphingInfinity";
 import { useBulkActions } from "./BulkActionsContext";
@@ -338,6 +339,7 @@ export default function TransaksiContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { setBulkActions, requestConfirm } = useBulkActions();
+  const { showAlert } = useAlert();
 
   // Mode seleksi massal: aktif kalau kartu transaksi ditahan (long-press).
   const [selectMode, setSelectMode] = useState(false);
@@ -365,6 +367,7 @@ export default function TransaksiContent() {
   async function handleBulkDelete() {
     if (selectedIds.size === 0) return;
     const ids = Array.from(selectedIds);
+    const count = ids.length;
 
     // Hapus dulu transaction_items yang nunjuk ke transaksi terpilih,
     // baru transaksinya sendiri — jaga-jaga kalau FK di Supabase belum
@@ -375,7 +378,7 @@ export default function TransaksiContent() {
       .in("transaction_id", ids);
 
     if (itemsError) {
-      setError(itemsError.message || "Gagal menghapus transaksi terpilih.");
+      showAlert(itemsError.message || "Gagal menghapus transaksi terpilih.", "error");
       return;
     }
 
@@ -385,10 +388,11 @@ export default function TransaksiContent() {
       .in("id", ids);
 
     if (deleteError) {
-      setError(deleteError.message || "Gagal menghapus transaksi terpilih.");
+      showAlert(deleteError.message || "Gagal menghapus transaksi terpilih.", "error");
       return;
     }
 
+    showAlert(`${count} transaksi berhasil dihapus.`, "success");
     exitSelectMode();
     load();
   }

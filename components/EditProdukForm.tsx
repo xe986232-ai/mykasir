@@ -15,6 +15,7 @@ import {
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { formatRupiah } from "@/lib/products";
 import { useProductsData } from "./ProductsDataContext";
+import { useAlert } from "./AlertContext";
 import { MorphingInfinity } from "./MorphingInfinity";
 import LoadingScreen from "./LoadingScreen";
 import BarcodeScannerModal from "./BarcodeScannerModal";
@@ -107,6 +108,7 @@ type ProductRow = {
 export default function EditProdukForm({ productId }: EditProdukFormProps) {
   const router = useRouter();
   const { categories, refetch } = useProductsData();
+  const { showAlert } = useAlert();
 
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -126,12 +128,10 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
   const [scannerOpen, setScannerOpen] = useState(false);
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const priceValue = parseFloat(price.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
 
@@ -191,16 +191,16 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
 
-    if (!name.trim()) return setError("Nama produk wajib diisi.");
-    if (!categoryId) return setError("Pilih kategori produk dulu.");
-    if (!unit.trim()) return setError("Satuan produk wajib diisi (misal: per kg, 1 botol).");
-    if (priceValue <= 0) return setError("Harga produk harus lebih dari 0.");
+    if (!name.trim()) return showAlert("Nama produk wajib diisi.", "error");
+    if (!categoryId) return showAlert("Pilih kategori produk dulu.", "error");
+    if (!unit.trim()) return showAlert("Satuan produk wajib diisi (misal: per kg, 1 botol).", "error");
+    if (priceValue <= 0) return showAlert("Harga produk harus lebih dari 0.", "error");
 
     if (!isSupabaseConfigured) {
-      setError(
-        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      showAlert(
+        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+        "error"
       );
       return;
     }
@@ -225,31 +225,33 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
     setSaving(false);
 
     if (updateError) {
-      setError(
+      showAlert(
         updateError.code === "23505"
           ? "Barcode ini udah dipakai produk lain."
-          : updateError.message || "Gagal menyimpan perubahan produk."
+          : updateError.message || "Gagal menyimpan perubahan produk.",
+        "error"
       );
       return;
     }
 
     refetch();
+    showAlert("Perubahan produk berhasil disimpan.", "success");
     setSuccess(true);
   }
 
   async function handleConfirmDelete() {
     setDeleting(true);
-    setDeleteError(null);
 
     const { error: deleteErr } = await supabase.from("products").delete().eq("id", productId);
     setDeleting(false);
 
     if (deleteErr) {
-      setDeleteError(deleteErr.message || "Gagal menghapus produk.");
+      showAlert(deleteErr.message || "Gagal menghapus produk.", "error");
       return;
     }
 
     refetch();
+    showAlert(`Produk "${name}" berhasil dihapus.`, "success");
     router.push("/produk/kelola");
   }
 
@@ -526,12 +528,6 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
           />
         </section>
 
-        {error && (
-          <p className="rounded-xl bg-badge/10 px-3.5 py-3 text-[12px] font-medium text-badge">
-            {error}
-          </p>
-        )}
-
         <button
           type="submit"
           disabled={saving}
@@ -591,12 +587,6 @@ export default function EditProdukForm({ productId }: EditProdukFormProps) {
               <p className="mt-1 text-center text-[12px] text-gray">
                 &ldquo;{name}&rdquo; akan dihapus permanen dan tidak bisa dikembalikan.
               </p>
-
-              {deleteError && (
-                <p className="mt-3 rounded-xl bg-badge/10 px-3 py-2 text-center text-[11.5px] font-medium text-badge">
-                  {deleteError}
-                </p>
-              )}
 
               <div className="mt-5 flex gap-2.5">
                 <button

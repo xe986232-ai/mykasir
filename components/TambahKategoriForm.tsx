@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Check, ImageOff } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useProductsData } from "./ProductsDataContext";
+import { useAlert } from "./AlertContext";
 import { MorphingInfinity } from "./MorphingInfinity";
 
 // Icon bawaan yang beneran punya komponen React di ProductsDataContext
@@ -47,6 +48,7 @@ function slugify(value: string) {
 export default function TambahKategoriForm() {
   const router = useRouter();
   const { refetch } = useProductsData();
+  const { showAlert } = useAlert();
 
   const [existingIds, setExistingIds] = useState<string[]>([]);
   const [nextSortOrder, setNextSortOrder] = useState(1);
@@ -63,7 +65,6 @@ export default function TambahKategoriForm() {
   const [sortOrder, setSortOrder] = useState("1");
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   // Ambil daftar id kategori yang udah ada (buat validasi duplikat) +
@@ -116,27 +117,27 @@ export default function TambahKategoriForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
 
     const cleanId = id.trim();
     const sortValue = parseInt(sortOrder, 10);
 
-    if (!label.trim()) return setError("Nama kategori wajib diisi.");
-    if (!cleanId) return setError("ID kategori wajib diisi.");
+    if (!label.trim()) return showAlert("Nama kategori wajib diisi.", "error");
+    if (!cleanId) return showAlert("ID kategori wajib diisi.", "error");
     if (!/^[a-z0-9-]+$/.test(cleanId)) {
-      return setError("ID kategori cuma boleh huruf kecil, angka, dan tanda strip (-).");
+      return showAlert("ID kategori cuma boleh huruf kecil, angka, dan tanda strip (-).", "error");
     }
     if (existingIds.includes(cleanId)) {
-      return setError(`ID "${cleanId}" udah dipakai kategori lain. Pakai ID lain.`);
+      return showAlert(`ID "${cleanId}" udah dipakai kategori lain. Pakai ID lain.`, "error");
     }
     if (displayType === "image" && !image.trim()) {
-      return setError("URL gambar wajib diisi kalau tipe tampilannya Gambar.");
+      return showAlert("URL gambar wajib diisi kalau tipe tampilannya Gambar.", "error");
     }
-    if (!Number.isFinite(sortValue)) return setError("Urutan harus berupa angka.");
+    if (!Number.isFinite(sortValue)) return showAlert("Urutan harus berupa angka.", "error");
 
     if (!isSupabaseConfigured) {
-      setError(
-        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      showAlert(
+        "Supabase belum dikonfigurasi di server ini. Set env NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+        "error"
       );
       return;
     }
@@ -154,11 +155,12 @@ export default function TambahKategoriForm() {
     setSaving(false);
 
     if (insertError) {
-      setError(insertError.message || "Gagal menyimpan kategori ke Supabase.");
+      showAlert(insertError.message || "Gagal menyimpan kategori ke Supabase.", "error");
       return;
     }
 
     refetch();
+    showAlert(`Kategori "${label.trim()}" berhasil ditambahkan.`, "success");
     setSuccess(true);
   }
 
@@ -378,12 +380,6 @@ export default function TambahKategoriForm() {
             Angka lebih kecil tampil lebih dulu. Disarankan: {nextSortOrder}.
           </p>
         </section>
-
-        {error && (
-          <p className="rounded-xl bg-badge/10 px-3.5 py-3 text-[12px] font-medium text-badge">
-            {error}
-          </p>
-        )}
 
         <button
           type="submit"
