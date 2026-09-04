@@ -62,7 +62,7 @@ export default function Sidebar() {
       style={{ width: SIDEBAR_WIDTH }}
       className="absolute inset-y-0 left-0 z-10 flex flex-col overflow-y-auto bg-gradient-to-b from-sidebar to-sidebar-dark"
     >
-      <div className="flex flex-col items-center gap-1 border-b border-white/15 p-4">
+      <div className="flex items-center justify-center border-b border-white/15 p-4">
         {/* SVG logo Jarwoo yang sama persis dengan yang di SplashScreen,
             di-inline langsung (bukan <img src="...svg">) biar @import font
             Pacifico dari Google Fonts tetap jalan normal. */}
@@ -85,7 +85,6 @@ export default function Sidebar() {
             Jarwoo
           </text>
         </svg>
-        <div className="text-[11px] text-white/65">Sistem Kasir</div>
       </div>
 
       <nav className="flex-1 py-2">
