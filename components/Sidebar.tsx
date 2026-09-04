@@ -62,27 +62,30 @@ export default function Sidebar() {
       style={{ width: SIDEBAR_WIDTH }}
       className="absolute inset-y-0 left-0 z-10 flex flex-col overflow-y-auto bg-gradient-to-b from-sidebar to-sidebar-dark"
     >
-      <div className="flex items-center gap-3 border-b border-white/15 p-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#fff"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+      <div className="flex flex-col items-center gap-1 border-b border-white/15 p-4">
+        {/* SVG logo Jarwoo yang sama persis dengan yang di SplashScreen,
+            di-inline langsung (bukan <img src="...svg">) biar @import font
+            Pacifico dari Google Fonts tetap jalan normal. */}
+        <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg" className="h-auto w-32">
+          <style>{`
+            @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+            .sidebar-logo-text {
+              font-family: 'Pacifico', cursive;
+              font-size: 72px;
+              fill: #ffffff;
+            }
+          `}</style>
+          <text
+            x="200"
+            y="90"
+            textAnchor="middle"
+            className="sidebar-logo-text"
+            transform="rotate(-4 200 90)"
           >
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <path d="M16 10a4 4 0 01-8 0" />
-          </svg>
-        </div>
-        <div>
-          <div className="text-[13px] font-bold text-white">Toko</div>
-          <div className="text-[11px] text-white/65">Sistem Kasir</div>
-        </div>
+            Jarwoo
+          </text>
+        </svg>
+        <div className="text-[11px] text-white/65">Sistem Kasir</div>
       </div>
 
       <nav className="flex-1 py-2">
